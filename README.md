@@ -6,6 +6,8 @@
 
 App de finanzas personales para quien maneja su plata repartida entre efectivo, Nequi, Daviplata y el banco. Registras lo que entra y sale de cada cuenta, te pones un presupuesto por categoría y la app te avisa antes de que te pases.
 
+**Demo en vivo:** [cuentasclaras-demo.vercel.app](https://cuentasclaras-demo.vercel.app). Usa el botón *Entrar a la demo*, no hace falta registrarse. La API corre en el plan gratuito de Render: si lleva un rato sin uso, la primera carga tarda cerca de un minuto mientras despierta.
+
 El diseño completo (historias de usuario, reglas de negocio, modelo de datos y plan de trabajo) está en [`docs/01-diseno.md`](docs/01-diseno.md).
 
 ![Resumen del mes](docs/capturas/02-resumen.png)
@@ -91,7 +93,7 @@ Los errores siguen el estándar RFC 9457 (`application/problem+json`): `{ "statu
 
 | Capa | Servicio | Configuración |
 |---|---|---|
-| Frontend | Vercel | Carpeta `frontend`, variables `VITE_API_URL` y `VITE_MODO_DEMO=true` |
+| Frontend | Vercel ([cuentasclaras-demo.vercel.app](https://cuentasclaras-demo.vercel.app)) | Carpeta `frontend`, variables `VITE_API_URL` y `VITE_MODO_DEMO=true` |
 | API | Render (Docker, Ohio) | Definida en [`render.yaml`](render.yaml); imagen multi-etapa en [`backend/Dockerfile`](backend/Dockerfile), sin root |
 | Base de datos | Neon, PostgreSQL 16 (Ohio) | `DATABASE_URL` se pega tal como la da Neon; la API la convierte a JDBC |
 
@@ -116,7 +118,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 - [x] Transferencias
 - [x] Presupuestos y resumen mensual
 - [x] Frontend (React)
-- [ ] Despliegue y demo
+- [x] Despliegue y demo
 
 ---
 
