@@ -32,6 +32,13 @@ class CuentasClarasApplicationTests {
 	}
 
 	@Test
+	void laDocumentacionOpenApiEsPublica() throws Exception {
+		mockMvc.perform(get("/v3/api-docs"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.info.title").value("CuentasClaras API"));
+	}
+
+	@Test
 	void cualquierOtraRutaExigeAutenticacion() throws Exception {
 		mockMvc.perform(get("/api/cuentas"))
 				.andExpect(status().isUnauthorized());

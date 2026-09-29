@@ -51,6 +51,11 @@ public class ManejadorDeErrores extends ResponseEntityExceptionHandler {
 		return problema(HttpStatus.FORBIDDEN, "Acción no permitida", ex.getMessage());
 	}
 
+	@ExceptionHandler(ReglaDeNegocioException.class)
+	ProblemDetail reglaDeNegocio(ReglaDeNegocioException ex) {
+		return problema(HttpStatus.UNPROCESSABLE_CONTENT, "Regla de negocio", ex.getMessage());
+	}
+
 	@ExceptionHandler(CredencialesInvalidasException.class)
 	ProblemDetail credencialesInvalidas(CredencialesInvalidasException ex) {
 		return problema(HttpStatus.UNAUTHORIZED, "No autenticado", ex.getMessage());
