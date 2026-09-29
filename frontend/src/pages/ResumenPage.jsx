@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AlertTriangle, ArrowDownRight, ArrowUpRight, PiggyBank, Scale, Wallet } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useDatos } from "../utils/useDatos";
-import { formatearPesos, mesActual, nombreMes } from "../utils/formato";
+import { formatearPesos, formatearPorcentaje, mesActual, nombreMes } from "../utils/formato";
 import { Aviso, Cargando, EncabezadoPagina, EstadoVacio, Tarjeta } from "../components/ui";
 import SelectorMes from "../components/SelectorMes";
 
@@ -68,7 +68,7 @@ export default function ResumenPage() {
                     <strong>{a.categoria.nombre}:</strong>{" "}
                     {a.estado === "EXCEDIDO"
                       ? `te pasaste del presupuesto por ${formatearPesos(-a.disponible)}.`
-                      : `llevas el ${a.porcentajeUsado}% del presupuesto; te quedan ${formatearPesos(a.disponible)}.`}
+                      : `llevas el ${formatearPorcentaje(a.porcentajeUsado)} del presupuesto; te quedan ${formatearPesos(a.disponible)}.`}
                   </span>
                 </Link>
               ))}
@@ -101,7 +101,7 @@ export default function ResumenPage() {
                           {g.categoria.nombre}
                         </span>
                         <span className="text-right font-medium text-slate-900">
-                          {formatearPesos(g.total)} <span className="text-xs font-normal text-slate-500">{g.porcentaje}%</span>
+                          {formatearPesos(g.total)} <span className="text-xs font-normal text-slate-500">{formatearPorcentaje(g.porcentaje)}</span>
                         </span>
                       </li>
                     ))}
