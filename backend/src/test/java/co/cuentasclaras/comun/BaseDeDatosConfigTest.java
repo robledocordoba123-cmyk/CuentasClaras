@@ -19,6 +19,23 @@ class BaseDeDatosConfigTest {
 	}
 
 	@Test
+	void toleraEspaciosSaltosDeLineaComillasYElComandoPsqlAlCopiarYPegar() {
+		String esperado = "jdbc:postgresql://ep-algo.neon.tech/cuentasclaras?sslmode=require";
+		String enlace = "postgresql://u:p@ep-algo.neon.tech/cuentasclaras?sslmode=require&channel_binding=require";
+
+		for (String pegado : new String[] { "  " + enlace + "\n", "'" + enlace + "'", "\"" + enlace + "\"",
+				"psql '" + enlace + "'" }) {
+			assertThat(BaseDeDatosConfig.ConexionJdbc.desde(pegado).url()).as(pegado).isEqualTo(esperado);
+		}
+	}
+
+	@Test
+	void unEnlaceJdbcOTextoSinEnlaceNoSeConvierte() {
+		assertThat(BaseDeDatosConfig.extraerEnlace("jdbc:postgresql://localhost:5433/base")).isNull();
+		assertThat(BaseDeDatosConfig.extraerEnlace("")).isNull();
+	}
+
+	@Test
 	void conservaElPuertoSiViene() {
 		var conexion = BaseDeDatosConfig.ConexionJdbc.desde("postgres://u:p@localhost:5433/base");
 
