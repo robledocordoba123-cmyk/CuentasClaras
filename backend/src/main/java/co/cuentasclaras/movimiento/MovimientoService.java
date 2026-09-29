@@ -58,6 +58,13 @@ public class MovimientoService {
 		return PaginaResponse.de(resultado, aRespuestas(resultado.getContent()));
 	}
 
+	/** HU-09: todos los movimientos de un mes, del más antiguo al más reciente, para exportar. */
+	@Transactional(readOnly = true)
+	public List<MovimientoResponse> delMes(UUID usuarioId, java.time.YearMonth mes) {
+		return aRespuestas(movimientoRepository.findByUsuarioIdAndFechaBetweenOrderByFechaAscCreadoEnAsc(usuarioId,
+				mes.atDay(1), mes.atEndOfMonth()));
+	}
+
 	@Transactional(readOnly = true)
 	public MovimientoResponse obtener(UUID usuarioId, UUID movimientoId) {
 		return aRespuestas(List.of(buscarPropio(usuarioId, movimientoId))).getFirst();
