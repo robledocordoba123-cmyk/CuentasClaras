@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { mesActual, nombreMes, sumarMeses } from "../utils/formato";
+import { mayuscula, mesActual, nombreMes, sumarMeses } from "../utils/formato";
 
 /** Flechas para moverse entre meses. No deja pasar del mes actual. */
 export default function SelectorMes({ mes, alCambiar }) {
@@ -13,7 +13,7 @@ export default function SelectorMes({ mes, alCambiar }) {
       >
         <ChevronLeft size={18} />
       </button>
-      <span className="min-w-36 text-center text-sm font-medium capitalize text-slate-800">{nombreMes(mes)}</span>
+      <span className="min-w-36 text-center text-sm font-medium text-slate-800">{mayuscula(nombreMes(mes))}</span>
       <button
         onClick={() => alCambiar(sumarMeses(mes, 1))}
         disabled={esActual}

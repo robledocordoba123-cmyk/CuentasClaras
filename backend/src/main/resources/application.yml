@@ -57,3 +57,5 @@ cuentasclaras:
     secreto: ${JWT_SECRET:}
     duracion: ${JWT_DURACION:8h}
 
+  # Orígenes que pueden llamar a la API desde el navegador (CORS), separados por coma.
+  cors-origen: ${CORS_ORIGIN:}

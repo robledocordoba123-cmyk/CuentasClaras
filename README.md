@@ -6,7 +6,13 @@
 
 App de finanzas personales para quien maneja su plata repartida entre efectivo, Nequi, Daviplata y el banco. Registras lo que entra y sale de cada cuenta, te pones un presupuesto por categoría y la app te avisa antes de que te pases.
 
-**Estado:** en construcción. El diseño completo (historias de usuario, reglas de negocio, modelo de datos y plan de trabajo) está en [`docs/01-diseno.md`](docs/01-diseno.md).
+El diseño completo (historias de usuario, reglas de negocio, modelo de datos y plan de trabajo) está en [`docs/01-diseno.md`](docs/01-diseno.md).
+
+![Resumen del mes](docs/capturas/02-resumen.png)
+
+| Presupuestos con semáforo | Movimientos | En el celular |
+|---|---|---|
+| ![Presupuestos](docs/capturas/05-presupuestos.png) | ![Movimientos](docs/capturas/03-movimientos.png) | ![Celular](docs/capturas/07-celular.png) |
 
 ## Stack
 
@@ -80,6 +86,16 @@ Si no se indica el mes, se usa el mes actual en hora de Colombia.
 Documentación interactiva: `http://localhost:8080/swagger-ui.html` (botón **Authorize** para pegar el token).
 
 Los errores siguen el estándar RFC 9457 (`application/problem+json`): `{ "status", "title", "detail" }`, y en validaciones un objeto `errores` por campo.
+
+## Despliegue
+
+| Capa | Servicio | Configuración |
+|---|---|---|
+| Frontend | Vercel | Carpeta `frontend`, variables `VITE_API_URL` y `VITE_MODO_DEMO=true` |
+| API | Render (Docker, Ohio) | Definida en [`render.yaml`](render.yaml); imagen multi-etapa en [`backend/Dockerfile`](backend/Dockerfile), sin root |
+| Base de datos | Neon, PostgreSQL 16 (Ohio) | `DATABASE_URL` se pega tal como la da Neon; la API la convierte a JDBC |
+
+Con el perfil `demo`, la API recrea en cada arranque la cuenta **demo@cuentasclaras.co** (contraseña `Demo2026!`) con tres meses de movimientos hasta hoy. No toca los datos de nadie más.
 
 ## Pruebas
 
