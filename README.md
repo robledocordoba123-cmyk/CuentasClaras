@@ -12,7 +12,7 @@ App de finanzas personales para quien maneja su plata repartida entre efectivo, 
 
 | Capa | Tecnologías |
 |---|---|
-| API | Java 21, Spring Boot 4, Spring Security, Spring Data JPA, Bean Validation |
+| API | Java 21, Spring Boot 4, Spring Security (OAuth2 Resource Server + JWT), Spring Data JPA, Bean Validation |
 | Datos | PostgreSQL 16, Flyway (migraciones) |
 | Pruebas | JUnit 5, MockMvc, Testcontainers (PostgreSQL real en Docker) |
 | CI | GitHub Actions |
@@ -32,6 +32,16 @@ cd backend
 
 Comprueba que está viva: `http://localhost:8080/actuator/health` → `{"status":"UP"}`
 
+## Autenticación
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/auth/registro` | Crea la cuenta y devuelve un JWT |
+| POST | `/api/auth/login` | Devuelve un JWT |
+| GET | `/api/auth/yo` | Datos de la persona autenticada (requiere `Authorization: Bearer <token>`) |
+
+Los errores siguen el estándar RFC 9457 (`application/problem+json`): `{ "status", "title", "detail" }`, y en validaciones un objeto `errores` por campo.
+
 ## Pruebas
 
 ```bash
@@ -45,7 +55,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 
 - [x] Diseño
 - [x] Esqueleto: Spring Boot, PostgreSQL, Flyway, seguridad base, CI
-- [ ] Registro e inicio de sesión (JWT)
+- [x] Registro e inicio de sesión (JWT)
 - [ ] Cuentas y categorías
 - [ ] Movimientos
 - [ ] Transferencias

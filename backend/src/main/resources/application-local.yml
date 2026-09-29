@@ -1,0 +1,5 @@
+# Solo para desarrollo y pruebas. Este secreto es público (está en el
+# repositorio), por eso el perfil "local" nunca se activa en producción.
+cuentasclaras:
+  jwt:
+    secreto: solo-para-desarrollo-local-no-usar-en-produccion-0123456789

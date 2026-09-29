@@ -5,6 +5,11 @@ spring:
   application:
     name: cuentasclaras-api
 
+  # Si no se indica SPRING_PROFILES_ACTIVE se usa "local" (application-local.yml).
+  # En producción se activa "prod" y el perfil local no se carga.
+  profiles:
+    default: local
+
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/cuentasclaras}
     username: ${DATABASE_USERNAME:cuentasclaras}
@@ -46,3 +51,9 @@ management:
 cuentasclaras:
   # Zona horaria de las personas usuarias: define qué es "el mes" (RN-09).
   zona-horaria: ${ZONA_HORARIA:America/Bogota}
+  jwt:
+    # Obligatorio y de al menos 32 caracteres. En desarrollo lo pone el perfil
+    # "local"; en producción, la variable de entorno JWT_SECRET (Render).
+    secreto: ${JWT_SECRET:}
+    duracion: ${JWT_DURACION:8h}
+
