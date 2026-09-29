@@ -1,6 +1,7 @@
 package co.cuentasclaras.auth;
 
 import co.cuentasclaras.TestcontainersConfiguration;
+import co.cuentasclaras.soporte.LimpiadorBD;
 import co.cuentasclaras.usuario.UsuarioRepository;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,9 +35,12 @@ class AuthControllerTest {
 	@Autowired
 	UsuarioRepository usuarioRepository;
 
+	@Autowired
+	LimpiadorBD limpiadorBD;
+
 	@BeforeEach
 	void limpiar() {
-		usuarioRepository.deleteAll();
+		limpiadorBD.limpiar();
 	}
 
 	private ResultActions registrar(String nombre, String email, String password) throws Exception {
