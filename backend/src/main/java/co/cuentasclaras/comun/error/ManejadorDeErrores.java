@@ -56,6 +56,11 @@ public class ManejadorDeErrores extends ResponseEntityExceptionHandler {
 		return problema(HttpStatus.UNPROCESSABLE_CONTENT, "Regla de negocio", ex.getMessage());
 	}
 
+	@ExceptionHandler(SolicitudInvalidaException.class)
+	ProblemDetail solicitudInvalida(SolicitudInvalidaException ex) {
+		return problema(HttpStatus.BAD_REQUEST, "Solicitud inválida", ex.getMessage());
+	}
+
 	@ExceptionHandler(CredencialesInvalidasException.class)
 	ProblemDetail credencialesInvalidas(CredencialesInvalidasException ex) {
 		return problema(HttpStatus.UNAUTHORIZED, "No autenticado", ex.getMessage());
