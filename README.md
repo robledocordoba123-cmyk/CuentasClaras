@@ -60,6 +60,8 @@ Cada persona solo ve y modifica lo suyo: pedir un recurso ajeno responde 404, ig
 |---|---|---|
 | GET | `/api/movimientos?desde=&hasta=&cuentaId=&categoriaId=&tipo=&pagina=0&tamano=20` | Filtrado y paginado, lo más reciente primero |
 | POST / PUT / DELETE | `/api/movimientos[/{id}]` | Ingresos y gastos |
+| POST | `/api/transferencias` | Mueve plata entre cuentas propias: dos movimientos en una sola transacción |
+| GET / DELETE | `/api/transferencias/{id}` | Ver / eliminar (borra las dos partes juntas) |
 
 Documentación interactiva: `http://localhost:8080/swagger-ui.html` (botón **Authorize** para pegar el token).
 
@@ -81,7 +83,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 - [x] Registro e inicio de sesión (JWT)
 - [x] Cuentas y categorías
 - [x] Movimientos
-- [ ] Transferencias
+- [x] Transferencias
 - [ ] Presupuestos y resumen mensual
 - [ ] Frontend
 - [ ] Despliegue y demo
