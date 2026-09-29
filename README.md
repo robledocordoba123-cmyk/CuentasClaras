@@ -54,6 +54,15 @@ Comprueba que está viva: `http://localhost:8080/actuator/health` → `{"status"
 
 Cada persona solo ve y modifica lo suyo: pedir un recurso ajeno responde 404, igual que si no existiera.
 
+### Movimientos
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/movimientos?desde=&hasta=&cuentaId=&categoriaId=&tipo=&pagina=0&tamano=20` | Filtrado y paginado, lo más reciente primero |
+| POST / PUT / DELETE | `/api/movimientos[/{id}]` | Ingresos y gastos |
+
+Documentación interactiva: `http://localhost:8080/swagger-ui.html` (botón **Authorize** para pegar el token).
+
 Los errores siguen el estándar RFC 9457 (`application/problem+json`): `{ "status", "title", "detail" }`, y en validaciones un objeto `errores` por campo.
 
 ## Pruebas
@@ -71,7 +80,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 - [x] Esqueleto: Spring Boot, PostgreSQL, Flyway, seguridad base, CI
 - [x] Registro e inicio de sesión (JWT)
 - [x] Cuentas y categorías
-- [ ] Movimientos
+- [x] Movimientos
 - [ ] Transferencias
 - [ ] Presupuestos y resumen mensual
 - [ ] Frontend
