@@ -48,6 +48,8 @@ public class SeguridadConfig {
 						// Spring redirige los errores internos a /error: debe ser
 						// público para que el cliente vea el 400/404 real y no un 401.
 						.requestMatchers("/error").permitAll()
+						// Documentación de la API (Swagger UI y la especificación OpenAPI).
+						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
 				}))
