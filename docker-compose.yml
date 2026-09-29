@@ -1,0 +1,23 @@
+# PostgreSQL para desarrollo local. Puerto 5433 en el computador para no
+# chocar con otros proyectos que ya usan el 5432 (ej. RitmoApp).
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cuentasclaras_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cuentasclaras
+      POSTGRES_PASSWORD: cuentasclaras_dev
+      POSTGRES_DB: cuentasclaras
+    ports:
+      - "5433:5432"
+    volumes:
+      - cuentasclaras_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cuentasclaras -d cuentasclaras"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  cuentasclaras_db_data:

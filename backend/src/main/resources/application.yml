@@ -1,0 +1,48 @@
+# Los valores entre ${...} se toman de variables de entorno. El valor después
+# de ":" es el de desarrollo local (docker compose); en producción se
+# sobrescriben desde Render y nunca se escriben en el repositorio.
+spring:
+  application:
+    name: cuentasclaras-api
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5433/cuentasclaras}
+    username: ${DATABASE_USERNAME:cuentasclaras}
+    password: ${DATABASE_PASSWORD:cuentasclaras_dev}
+
+  jpa:
+    # El esquema lo manejan SOLO las migraciones de Flyway. Hibernate solo
+    # valida que las entidades coincidan con las tablas; nunca las modifica.
+    hibernate:
+      ddl-auto: validate
+    # Sin esto, JPA mantiene abierta la conexión a la base de datos durante
+    # toda la petición HTTP, incluida la serialización de la respuesta.
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: ${PORT:8080}
+  # Mensajes de error sin detalles internos (stack traces) hacia el cliente.
+  error:
+    include-stacktrace: never
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+cuentasclaras:
+  # Zona horaria de las personas usuarias: define qué es "el mes" (RN-09).
+  zona-horaria: ${ZONA_HORARIA:America/Bogota}
