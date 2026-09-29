@@ -41,3 +41,10 @@ export const NOMBRES_TIPO_CUENTA = {
   BILLETERA_DIGITAL: "Billetera digital",
   BANCO: "Banco",
 };
+
+// "septiembre de 2026" → "Septiembre de 2026" (solo la primera letra).
+export const mayuscula = (texto) => texto.charAt(0).toUpperCase() + texto.slice(1);
+
+// 86.1 → "86,1 %", como se escribe en Colombia.
+export const formatearPorcentaje = (valor) =>
+  `${Number(valor).toLocaleString("es-CO", { maximumFractionDigits: 1 })} %`;

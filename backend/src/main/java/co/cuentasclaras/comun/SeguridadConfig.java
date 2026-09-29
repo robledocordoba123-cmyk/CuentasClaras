@@ -3,6 +3,7 @@ package co.cuentasclaras.comun;
 import co.cuentasclaras.auth.JwtProperties;
 import co.cuentasclaras.auth.TokenService;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +19,15 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Seguridad de la API.
@@ -40,6 +46,8 @@ public class SeguridadConfig {
 		return http
 				// API REST con tokens en encabezado: no hay sesión ni cookies,
 				// así que CSRF no aplica.
+				.cors(cors -> {
+				})
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
@@ -63,6 +71,31 @@ public class SeguridadConfig {
 	 * alguien robe la base de datos, sacar las contraseñas por fuerza bruta es
 	 * muy costoso, y dos personas con la misma contraseña tienen hashes distintos.
 	 */
+	/**
+	 * CORS: el navegador solo deja que un frontend en otro dominio (Vercel) llame
+	 * a esta API si la API lo autoriza. Se permiten únicamente los orígenes de
+	 * CORS_ORIGIN (separados por coma). Si está vacío no se registra ninguna
+	 * regla: en desarrollo no hace falta, porque Vite redirige /api al backend y
+	 * para el navegador todo viene del mismo origen. (Registrar una regla con la
+	 * lista vacía haría que Spring rechazara con 403 toda petición del navegador.)
+	 */
+	@Bean
+	CorsConfigurationSource corsConfigurationSource(@Value("${cuentasclaras.cors-origen:}") String origenes) {
+		List<String> permitidos = Arrays.stream(origenes.split(",")).map(String::strip).filter(o -> !o.isEmpty()).toList();
+		CorsConfiguration configuracion = new CorsConfiguration();
+		configuracion.setAllowedOrigins(permitidos);
+		configuracion.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+		configuracion.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+		configuracion.setExposedHeaders(List.of("Content-Disposition"));
+		configuracion.setMaxAge(3600L);
+		UrlBasedCorsConfigurationSource fuente = new UrlBasedCorsConfigurationSource();
+		if (permitidos.isEmpty()) {
+			return fuente;
+		}
+		fuente.registerCorsConfiguration("/**", configuracion);
+		return fuente;
+	}
+
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

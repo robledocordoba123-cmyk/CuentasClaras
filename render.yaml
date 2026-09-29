@@ -1,0 +1,30 @@
+# Configuración de la API en Render como código (Blueprint).
+# En Render: New → Blueprint → elegir este repositorio.
+#
+# La base de datos vive en Neon (el PostgreSQL gratuito de Render se borra a
+# los 30 días). Su enlace se pega a mano en DATABASE_URL al crear el
+# Blueprint; nunca va en el repositorio.
+services:
+  - type: web
+    name: cuentasclaras-api
+    runtime: docker
+    region: ohio              # misma región que la base de datos en Neon
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      # "demo" recrea la cuenta de demostración en cada arranque.
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod,demo
+      - key: ZONA_HORARIA
+        value: America/Bogota
+      # Render genera un secreto largo y aleatorio; nadie necesita conocerlo.
+      - key: JWT_SECRET
+        generateValue: true
+      # Se piden al crear el Blueprint (sync: false = no están en el repositorio).
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
