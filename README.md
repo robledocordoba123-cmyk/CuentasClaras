@@ -15,6 +15,7 @@ App de finanzas personales para quien maneja su plata repartida entre efectivo, 
 | API | Java 21, Spring Boot 4, Spring Security (OAuth2 Resource Server + JWT), Spring Data JPA, Bean Validation |
 | Datos | PostgreSQL 16, Flyway (migraciones) |
 | Pruebas | JUnit 5, MockMvc, Testcontainers (PostgreSQL real en Docker) |
+| Frontend | React 19, Vite, Tailwind CSS 4, React Router, Recharts |
 | CI | GitHub Actions |
 
 ## Cómo correrlo en local
@@ -98,7 +99,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 - [x] Movimientos
 - [x] Transferencias
 - [x] Presupuestos y resumen mensual
-- [ ] Frontend
+- [x] Frontend (React)
 - [ ] Despliegue y demo
 
 ---
