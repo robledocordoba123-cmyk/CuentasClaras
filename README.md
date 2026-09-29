@@ -40,6 +40,20 @@ Comprueba que está viva: `http://localhost:8080/actuator/health` → `{"status"
 | POST | `/api/auth/login` | Devuelve un JWT |
 | GET | `/api/auth/yo` | Datos de la persona autenticada (requiere `Authorization: Bearer <token>`) |
 
+### Cuentas y categorías
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/cuentas?incluirArchivadas=false` | Cuentas propias con saldo actual calculado |
+| GET / PUT | `/api/cuentas/{id}` | Ver / editar |
+| POST | `/api/cuentas` | Crear (nombre, tipo, saldo inicial) |
+| DELETE | `/api/cuentas/{id}` | Elimina si no tiene movimientos; si tiene, la archiva |
+| PATCH | `/api/cuentas/{id}/restaurar` | Desarchivar |
+| GET | `/api/categorias?tipo=GASTO` | Por defecto + propias |
+| POST / PUT / DELETE | `/api/categorias[/{id}]` | Solo categorías propias; las por defecto dan 403 |
+
+Cada persona solo ve y modifica lo suyo: pedir un recurso ajeno responde 404, igual que si no existiera.
+
 Los errores siguen el estándar RFC 9457 (`application/problem+json`): `{ "status", "title", "detail" }`, y en validaciones un objeto `errores` por campo.
 
 ## Pruebas
@@ -56,7 +70,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 - [x] Diseño
 - [x] Esqueleto: Spring Boot, PostgreSQL, Flyway, seguridad base, CI
 - [x] Registro e inicio de sesión (JWT)
-- [ ] Cuentas y categorías
+- [x] Cuentas y categorías
 - [ ] Movimientos
 - [ ] Transferencias
 - [ ] Presupuestos y resumen mensual
