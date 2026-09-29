@@ -1,10 +1,13 @@
 package co.cuentasclaras.comun;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
  * pruebas se usa la configuración normal de Spring Boot.
  */
 @Configuration
-@ConditionalOnExpression("'${DATABASE_URL:}'.startsWith('postgresql://') or '${DATABASE_URL:}'.startsWith('postgres://')")
+@Conditional(BaseDeDatosConfig.EsEnlaceDeProveedor.class)
 public class BaseDeDatosConfig {
 
 	@Bean
@@ -37,10 +40,47 @@ public class BaseDeDatosConfig {
 				.build();
 	}
 
+	/**
+	 * Al copiar y pegar el enlace es fácil que se cuelen espacios, un salto de
+	 * línea o comillas, o que se copie el comando completo {@code psql '...'}.
+	 * Se busca el enlace dentro del texto en vez de exigir que empiece
+	 * exactamente por "postgresql://" (así falló el primer despliegue).
+	 */
+	static String extraerEnlace(String texto) {
+		// Un enlace JDBC también contiene "postgres" ("jdbc:postgresql://"), pero
+		// ese ya está en el formato correcto y no hay que convertirlo.
+		if (texto == null || texto.contains("jdbc:")) {
+			return null;
+		}
+		int inicio = texto.indexOf("postgres");
+		if (inicio < 0) {
+			return null;
+		}
+		String enlace = texto.substring(inicio).strip();
+		int fin = 0;
+		while (fin < enlace.length() && !Character.isWhitespace(enlace.charAt(fin))
+				&& enlace.charAt(fin) != '\'' && enlace.charAt(fin) != '"') {
+			fin++;
+		}
+		enlace = enlace.substring(0, fin);
+		return (enlace.startsWith("postgresql://") || enlace.startsWith("postgres://")) ? enlace : null;
+	}
+
+	static class EsEnlaceDeProveedor implements Condition {
+
+		@Override
+		public boolean matches(ConditionContext contexto, AnnotatedTypeMetadata metadatos) {
+			String valor = contexto.getEnvironment().getProperty("DATABASE_URL");
+			// Si ya viene en formato JDBC, lo maneja la configuración normal de Spring.
+			return extraerEnlace(valor) != null;
+		}
+
+	}
+
 	record ConexionJdbc(String url, String usuario, String clave) {
 
-		static ConexionJdbc desde(String enlace) {
-			URI uri = URI.create(enlace);
+		static ConexionJdbc desde(String texto) {
+			URI uri = URI.create(extraerEnlace(texto));
 			String[] credenciales = uri.getRawUserInfo().split(":", 2);
 			// channel_binding no es un parámetro del driver JDBC; sslmode sí.
 			String parametros = uri.getRawQuery() == null ? "" : Arrays.stream(uri.getRawQuery().split("&"))
