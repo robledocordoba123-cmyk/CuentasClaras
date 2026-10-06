@@ -96,7 +96,7 @@ export default function MovimientosPage() {
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <SelectorMes mes={mes} alCambiar={(m) => { setMes(m); setPagina(0); }} />
-        <div className="inline-flex rounded-lg border border-slate-300 bg-white p-1 text-sm">
+        <div className="inline-flex rounded-lg border border-slate-300 bg-panel p-1 text-sm">
           {[["", "Todos"], ["INGRESO", "Ingresos"], ["GASTO", "Gastos"]].map(([valor, texto]) => (
             <button
               key={valor}
@@ -118,7 +118,7 @@ export default function MovimientosPage() {
         <EstadoVacio icono={ArrowLeftRight} titulo="No hay movimientos en este mes" descripcion="Registra tu primer gasto o ingreso con el botón Nuevo." />
       ) : (
         <>
-          <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-panel">
             {datos.contenido.map((m) => {
               const esEntrada = m.tipo === "INGRESO" || m.tipo === "TRANSFERENCIA_ENTRADA";
               const esTransferencia = m.tipo.startsWith("TRANSFERENCIA");
@@ -137,7 +137,7 @@ export default function MovimientosPage() {
                       {esTransferencia ? (esEntrada ? "Entrada" : "Salida") : m.categoria.nombre} · {m.cuenta.nombre} · {formatearFecha(m.fecha)}
                     </p>
                   </div>
-                  <span className={`shrink-0 font-semibold ${esTransferencia ? "text-slate-500" : esEntrada ? "text-emerald-600" : "text-slate-900"}`}>
+                  <span className={`shrink-0 font-semibold ${esTransferencia ? "text-slate-500" : esEntrada ? "text-brillo" : "text-slate-900"}`}>
                     {esEntrada ? "+" : "−"}
                     {formatearPesos(m.monto)}
                   </span>
@@ -183,7 +183,7 @@ export default function MovimientosPage() {
                   type="button"
                   key={valor}
                   onClick={() => cambiar("tipo")({ target: { value: valor } })}
-                  className={`rounded-md py-1.5 font-medium ${formulario.tipo === valor ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+                  className={`rounded-md py-1.5 font-medium ${formulario.tipo === valor ? "bg-panel text-slate-900 shadow-sm" : "text-slate-500"}`}
                 >
                   {texto}
                 </button>

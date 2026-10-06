@@ -123,12 +123,39 @@ export default function AccesoPage() {
         </div>
       </div>
 
-      <div className="hidden flex-col justify-end bg-gradient-to-br from-emerald-600 to-teal-800 p-12 text-white lg:flex">
-        <p className="text-3xl font-semibold leading-snug">"Cuentas claras, amistades largas."</p>
-        <p className="mt-4 max-w-md text-emerald-100">
-          Efectivo, Nequi, Daviplata y el banco en un solo lugar. Ponte un presupuesto por categoría y la app te avisa antes
-          de que te pases.
-        </p>
+      <div className="relative hidden flex-col justify-between overflow-hidden border-l border-slate-200 bg-panel p-12 lg:flex">
+        <div className="pointer-events-none absolute -right-24 top-10 h-96 w-96 rounded-full bg-brillo/15 blur-3xl" />
+
+        {/* Una "tarjeta" con el saldo, como la de una app de banco. */}
+        <div className="relative mx-auto mt-16 w-full max-w-sm rotate-[-4deg] rounded-3xl border border-emerald-200 bg-[linear-gradient(135deg,#123a2b,#0c1210_70%)] p-6 shadow-[0_30px_80px_rgb(0_0_0/0.6)]">
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span>Saldo en tus cuentas</span>
+            <span className="font-semibold text-brillo">+12,4 % este mes</span>
+          </div>
+          <p className="mt-3 font-display text-4xl font-semibold tracking-tight text-slate-900">$ 3.018.700</p>
+          <div className="mt-6 grid grid-cols-3 gap-2 text-xs">
+            {[
+              ["Efectivo", "$ 412.000"],
+              ["Nequi", "$ 689.700"],
+              ["Banco", "$ 1.917.000"],
+            ].map(([cuenta, saldo]) => (
+              <div key={cuenta} className="rounded-xl border border-slate-200 bg-black/20 p-2.5">
+                <p className="text-slate-500">{cuenta}</p>
+                <p className="mt-0.5 font-semibold text-slate-800">{saldo}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative">
+          <p className="font-display text-3xl font-semibold leading-snug text-slate-900">
+            “Cuentas claras, <span className="text-brillo">amistades largas</span>.”
+          </p>
+          <p className="mt-4 max-w-md text-slate-500">
+            Efectivo, Nequi, Daviplata y el banco en un solo lugar. Ponte un presupuesto por categoría y la app te avisa antes
+            de que te pases.
+          </p>
+        </div>
       </div>
     </div>
   );
