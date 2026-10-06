@@ -16,6 +16,8 @@ El diseño completo (historias de usuario, reglas de negocio, modelo de datos y 
 |---|---|---|
 | ![Presupuestos](docs/capturas/05-presupuestos.png) | ![Movimientos](docs/capturas/03-movimientos.png) | ![Celular](docs/capturas/07-celular.png) |
 
+La interfaz usa un tema oscuro de app financiera: el saldo total como cifra principal, un menú en forma de cápsula y cifras alineadas (`tabular-nums`) para leer los montos como en un extracto. Los colores son variables en [`index.css`](frontend/src/index.css).
+
 ## Stack
 
 | Capa | Tecnologías |

@@ -76,7 +76,7 @@ export default function PresupuestosPage() {
           {presupuestos.map((p) => {
             const estilo = ESTILO_ESTADO[p.estado];
             return (
-              <div key={p.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div key={p.id} className="rounded-2xl border border-slate-200 bg-panel p-5 shadow-sm">
                 <div className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2 font-medium text-slate-900">
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: p.categoria.color }} />
