@@ -117,17 +117,21 @@ public class DatosDeDemo implements ApplicationRunner {
 			for (int dia = 2; dia <= 28; dia += 3) {
 				r.movimiento(efectivo, TRANSPORTE, TipoMovimiento.GASTO, 5_900 + r.variar(12_000), dia, "Metro y bus");
 			}
-			for (int dia : new int[] { 6, 13, 16, 20, 24, 27 }) {
+			// El primer domicilio y el streaming caen el día 1: así, cualquier día del mes,
+			// los presupuestos muestran los tres estados (en control, alerta y excedido).
+			for (int dia : new int[] { 1, 6, 13, 20, 24, 27 }) {
 				r.movimiento(nequi, DOMICILIOS, TipoMovimiento.GASTO, 24_000 + r.variar(22_000), dia, "Domicilio de comida");
 			}
-			r.movimiento(nequi, ENTRETENIMIENTO, TipoMovimiento.GASTO, 38_900, 5, "Suscripciones de streaming");
+			r.movimiento(nequi, ENTRETENIMIENTO, TipoMovimiento.GASTO, 38_900, 1, "Suscripciones de streaming");
 			r.movimiento(efectivo, ENTRETENIMIENTO, TipoMovimiento.GASTO, 45_000 + r.variar(40_000), 21, "Salida con amigos");
 			r.movimiento(nequi, mascotas.getId(), TipoMovimiento.GASTO, 72_000, 15, "Concentrado para Luna");
 			if (mes.equals(actual.minusMonths(1))) {
 				r.movimiento(banco, SALUD, TipoMovimiento.GASTO, 95_000, 22, "Cita médica particular");
 			}
-			r.transferencia(banco, efectivo, 200_000, 2, "Retiro en cajero");
-			r.transferencia(banco, nequi, 250_000, 10, "Recarga Nequi");
+			// Lo que se pasa a Nequi y al efectivo alcanza para sus gastos del mes:
+			// ninguna cuenta de la demo queda con saldo negativo.
+			r.transferencia(banco, efectivo, 450_000, 2, "Retiro en cajero");
+			r.transferencia(banco, nequi, 500_000, 1, "Recarga Nequi");
 		}
 
 		definirPresupuestos(u, actual, mascotas.getId());

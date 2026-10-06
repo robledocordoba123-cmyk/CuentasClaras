@@ -5,7 +5,7 @@ import { mayuscula, mesActual, nombreMes, sumarMeses } from "../utils/formato";
 export default function SelectorMes({ mes, alCambiar }) {
   const esActual = mes >= mesActual();
   return (
-    <div className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white p-1">
+    <div className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-panel p-1">
       <button
         onClick={() => alCambiar(sumarMeses(mes, -1))}
         className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100"

@@ -38,7 +38,10 @@ class DatosDeDemoTest extends PruebaDeApi {
 		datosDeDemo.run(null);
 		String token = loginDemo();
 
-		pedir(GET, "/api/cuentas", token).andExpect(jsonPath("$.length()").value(3));
+		String cuentas = pedir(GET, "/api/cuentas", token).andExpect(jsonPath("$.length()").value(3))
+				.andReturn().getResponse().getContentAsString();
+		List<Number> saldos = JsonPath.read(cuentas, "$[*].saldoActual");
+		assertThat(saldos).allSatisfy(saldo -> assertThat(saldo.doubleValue()).isNotNegative());
 		pedir(GET, "/api/movimientos", token).andExpect(jsonPath("$.totalElementos", greaterThan(30)));
 
 		String presupuestos = pedir(GET, "/api/presupuestos", token).andReturn().getResponse().getContentAsString();

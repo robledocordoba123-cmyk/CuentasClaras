@@ -4,9 +4,9 @@ import { X } from "lucide-react";
 import { useEffect } from "react";
 
 const VARIANTES = {
-  primario: "bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm",
-  secundario: "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50",
-  peligro: "bg-white text-red-600 border border-red-200 hover:bg-red-50",
+  primario: "bg-brillo text-fondo font-semibold hover:brightness-110 shadow-[0_0_24px_rgb(61_242_162/0.25)]",
+  secundario: "bg-slate-100 text-slate-800 border border-slate-300 hover:border-slate-400 hover:bg-slate-200",
+  peligro: "bg-transparent text-red-600 border border-red-200 hover:bg-red-50",
   fantasma: "text-slate-600 hover:bg-slate-100",
 };
 
@@ -14,7 +14,7 @@ export function Boton({ variante = "primario", icono: Icono, className = "", chi
   return (
     <button
       {...props}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTES[variante]} ${className}`}
     >
       {Icono && <Icono size={16} aria-hidden="true" />}
       {children}
@@ -24,14 +24,14 @@ export function Boton({ variante = "primario", icono: Icono, className = "", chi
 
 /** Campo de formulario: input, o select si recibe opciones como children. */
 export function Campo({ etiqueta, error, children, ...props }) {
-  const clase = `mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+  const clase = `mt-1 w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brillo/60 bg-slate-50 text-slate-900 ${
     error ? "border-red-400" : "border-slate-300"
   }`;
   return (
     <label className="block text-sm font-medium text-slate-700">
       {etiqueta}
       {children ? (
-        <select {...props} className={`${clase} bg-white`}>
+        <select {...props} className={clase}>
           {children}
         </select>
       ) : (
@@ -44,7 +44,7 @@ export function Campo({ etiqueta, error, children, ...props }) {
 
 export function Tarjeta({ titulo, accion, className = "", children }) {
   return (
-    <section className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ${className}`}>
+    <section className={`rounded-2xl border border-slate-200 bg-panel p-5 shadow-[inset_0_1px_0_rgb(255_255_255/0.04)] ${className}`}>
       {(titulo || accion) && (
         <div className="mb-4 flex items-center justify-between gap-3">
           {titulo && <h2 className="font-semibold text-slate-900">{titulo}</h2>}
@@ -60,7 +60,7 @@ export function EncabezadoPagina({ titulo, subtitulo, accion }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">{titulo}</h1>
+        <h1 className="text-3xl font-semibold text-slate-900">{titulo}</h1>
         {subtitulo && <p className="mt-0.5 text-sm text-slate-500">{subtitulo}</p>}
       </div>
       {accion}
@@ -70,7 +70,7 @@ export function EncabezadoPagina({ titulo, subtitulo, accion }) {
 
 export function EstadoVacio({ icono: Icono, titulo, descripcion, accion }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+    <div className="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-panel px-6 py-12 text-center">
       {Icono && <Icono size={36} className="mb-3 text-slate-400" aria-hidden="true" />}
       <p className="font-medium text-slate-800">{titulo}</p>
       {descripcion && <p className="mt-1 max-w-sm text-sm text-slate-500">{descripcion}</p>}
@@ -100,12 +100,12 @@ export function Modal({ titulo, abierto, alCerrar, children }) {
 
   if (!abierto) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center" onClick={alCerrar}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center" onClick={alCerrar}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label={titulo}
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-panel p-6 shadow-2xl"
         onClick={(evento) => evento.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
