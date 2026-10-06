@@ -110,9 +110,9 @@ export default function CuentasPage() {
           {cuentas.map((c) => {
             const Icono = ICONOS[c.tipo];
             return (
-              <div key={c.id} className={`rounded-2xl border bg-white p-5 shadow-sm ${c.archivada ? "border-dashed border-slate-300 opacity-70" : "border-slate-200"}`}>
+              <div key={c.id} className={`rounded-2xl border bg-panel p-5 shadow-sm ${c.archivada ? "border-dashed border-slate-300 opacity-70" : "border-slate-200"}`}>
                 <div className="flex items-start justify-between">
-                  <span className="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+                  <span className="rounded-lg bg-emerald-50 p-2 text-brillo">
                     <Icono size={20} aria-hidden="true" />
                   </span>
                   <div className="flex">
