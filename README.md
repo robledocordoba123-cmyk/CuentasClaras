@@ -125,3 +125,7 @@ No necesitan la base de docker compose: Testcontainers levanta su propio Postgre
 ---
 
 Proyecto de portafolio de **Manuela Córdoba Robledo**, aprendiz de Análisis y Desarrollo de Software (SENA).
+
+## Uso de inteligencia artificial
+
+Este proyecto se desarrolló con apoyo de herramientas de IA (Claude Code). El diseño, las decisiones, la revisión del código y las pruebas son míos, y puedo explicar cada parte.
