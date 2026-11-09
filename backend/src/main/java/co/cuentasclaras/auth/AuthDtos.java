@@ -1,5 +1,6 @@
 package co.cuentasclaras.auth;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -31,7 +32,11 @@ public final class AuthDtos {
 			// contraseña más larga se truncaría sin avisar.
 			@NotBlank(message = "La contraseña es obligatoria.")
 			@Size(min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres.")
-			String password) {
+			String password,
+
+			// Ley 1581: sin autorización expresa no se pueden tratar los datos.
+			@AssertTrue(message = "Debes autorizar el tratamiento de tus datos para crear la cuenta.")
+			boolean aceptaPolitica) {
 
 		// Se quitan los espacios de los extremos ANTES de validar: un correo
 		// copiado y pegado con un espacio al final no debe dar "formato inválido".
@@ -54,6 +59,20 @@ public final class AuthDtos {
 		}
 	}
 
+	public record CambioPasswordRequest(
+			@NotBlank(message = "Escribe tu contraseña actual.")
+			String actual,
+
+			@NotBlank(message = "Escribe la nueva contraseña.")
+			@Size(min = 8, max = 72, message = "La contraseña debe tener entre 8 y 72 caracteres.")
+			String nueva) {
+	}
+
+	public record BorrarCuentaRequest(
+			@NotBlank(message = "Escribe tu contraseña para confirmar.")
+			String password) {
+	}
+
 	private static String recortar(String texto) {
 		return texto == null ? null : texto.strip();
 	}
@@ -61,7 +80,12 @@ public final class AuthDtos {
 	public record UsuarioResponse(UUID id, String nombre, String email) {
 	}
 
-	public record TokenResponse(String token, String tipo, Instant expiraEn, UsuarioResponse usuario) {
+	/** El token NO va aquí: viaja solo en la cookie HttpOnly. */
+	public record SesionResponse(Instant expiraEn, UsuarioResponse usuario) {
+	}
+
+	/** Resultado interno del servicio: la sesión más el token para la cookie. */
+	public record SesionIniciada(SesionResponse sesion, TokenService.TokenEmitido token) {
 	}
 
 }

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowLeftRight, Download, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../api/cliente";
-import { useSesion } from "../context/SesionContext";
 import { useDatos } from "../utils/useDatos";
 import { formatearFecha, formatearPesos, hoyISO, mesActual } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
@@ -17,7 +16,6 @@ function rangoDelMes(mes) {
 }
 
 export default function MovimientosPage() {
-  const { token } = useSesion();
   const [mes, setMes] = useState(mesActual());
   const [tipo, setTipo] = useState("");
   const [pagina, setPagina] = useState(0);
@@ -58,8 +56,8 @@ export default function MovimientosPage() {
     const cuerpo = { ...formulario, monto: formulario.monto === "" ? null : Number(formulario.monto) };
     delete cuerpo.id;
     try {
-      if (formulario.id) await api.put(`/movimientos/${formulario.id}`, cuerpo, token);
-      else await api.post("/movimientos", cuerpo, token);
+      if (formulario.id) await api.put(`/movimientos/${formulario.id}`, cuerpo);
+      else await api.post("/movimientos", cuerpo);
       setFormulario(null);
       recargar();
     } catch (err) {
@@ -71,7 +69,7 @@ export default function MovimientosPage() {
 
   async function eliminar(m) {
     if (!window.confirm(`¿Eliminar el ${m.tipo === "INGRESO" ? "ingreso" : "gasto"} de ${formatearPesos(m.monto)}?`)) return;
-    await api.delete(`/movimientos/${m.id}`, token);
+    await api.delete(`/movimientos/${m.id}`);
     recargar();
   }
 
@@ -84,7 +82,7 @@ export default function MovimientosPage() {
         subtitulo="Tus ingresos, gastos y transferencias."
         accion={
           <div className="flex flex-wrap gap-2">
-            <Boton variante="secundario" icono={Download} onClick={() => api.descargar(`/movimientos/exportar?mes=${mes}`, token, `cuentasclaras-${mes}.csv`)}>
+            <Boton variante="secundario" icono={Download} onClick={() => api.descargar(`/movimientos/exportar?mes=${mes}`, `cuentasclaras-${mes}.csv`)}>
               Excel
             </Boton>
             <Boton icono={Plus} onClick={abrirNuevo} disabled={!cuentas?.length}>

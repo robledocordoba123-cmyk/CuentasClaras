@@ -47,9 +47,17 @@ Comprueba que está viva: `http://localhost:8080/actuator/health` → `{"status"
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| POST | `/api/auth/registro` | Crea la cuenta y devuelve un JWT |
-| POST | `/api/auth/login` | Devuelve un JWT |
-| GET | `/api/auth/yo` | Datos de la persona autenticada (requiere `Authorization: Bearer <token>`) |
+| POST | `/api/auth/registro` | Crea la cuenta (exige `aceptaPolitica: true`) y abre la sesión |
+| POST | `/api/auth/login` | Abre la sesión (máximo 10 intentos fallidos por cuenta cada 15 minutos) |
+| POST | `/api/auth/logout` | Cierra la sesión en ese navegador |
+| GET | `/api/auth/yo` | Datos de la persona con sesión |
+| PUT | `/api/auth/password` | Cambia la contraseña y cierra las demás sesiones |
+| GET | `/api/auth/mis-datos` | Descarga en JSON todo lo que la app guarda de la persona (Ley 1581) |
+| DELETE | `/api/auth/cuenta` | Borra la cuenta y todos sus datos, con la contraseña (Ley 1581) |
+
+**La sesión va en una cookie, no en JavaScript.** El JWT viaja en la cookie `cc_sesion` (HttpOnly, Secure, SameSite=Strict, solo para `/api`), así un script inyectado no lo puede leer. La página llama a `/api` en su misma dirección y Vercel la reenvía a Render, por eso la cookie es del mismo sitio. Cada token lleva la versión de sesión: cambiar la contraseña o borrar la cuenta lo invalida de inmediato. Swagger y las pruebas pueden seguir usando `Authorization: Bearer`.
+
+**Datos personales (Ley 1581).** Sin autorizar el tratamiento de datos no se crea la cuenta; se guarda cuándo y con qué versión de la política. Cada persona puede descargar sus datos y borrar su cuenta desde *Tu cuenta*. La cuenta de demostración no se puede borrar ni cambiar de clave.
 
 ### Cuentas y categorías
 

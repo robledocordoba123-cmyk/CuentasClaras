@@ -1,50 +1,52 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { api, configurarAlExpirarSesion } from "../api/cliente";
+import { api, configurarAlExpirarSesion, esperarApi } from "../api/cliente";
 
 const SesionContext = createContext(null);
-const CLAVE = "cuentasclaras_sesion";
 
-// La sesión (token + datos básicos) se guarda en localStorage para que un
-// recargo de página no la cierre. Si el token ya venció, se descarta al leerla.
-function leerSesion() {
-  try {
-    const sesion = JSON.parse(localStorage.getItem(CLAVE));
-    if (sesion && new Date(sesion.expiraEn) > new Date()) return sesion;
-  } catch {
-    // localStorage puede no estar disponible (modo privado): se sigue sin sesión.
-  }
-  return null;
-}
-
+// La sesión vive en una cookie HttpOnly que pone la API: aquí solo se guarda
+// quién es la persona. Al abrir la app se pregunta a la API si hay sesión.
 export function SesionProvider({ children }) {
-  const [sesion, setSesion] = useState(leerSesion);
+  const [estado, setEstado] = useState("comprobando"); // comprobando | lista
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
+    // Versiones anteriores guardaban el token en localStorage: se borra.
     try {
-      if (sesion) localStorage.setItem(CLAVE, JSON.stringify(sesion));
-      else localStorage.removeItem(CLAVE);
+      localStorage.removeItem("cuentasclaras_sesion");
     } catch {
-      // Sin almacenamiento: la sesión dura mientras la pestaña esté abierta.
+      // Sin almacenamiento no hay nada que borrar.
     }
-  }, [sesion]);
+    let vigente = true;
+    esperarApi()
+      .then(() => api.get("/auth/yo"))
+      .then((yo) => vigente && setUsuario(yo))
+      .catch(() => vigente && setUsuario(null))
+      .finally(() => vigente && setEstado("lista"));
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
-  const cerrarSesion = useCallback(() => setSesion(null), []);
+  const cerrarSesion = useCallback(async () => {
+    setUsuario(null);
+    await api.post("/auth/logout").catch(() => {});
+  }, []);
 
   useEffect(() => {
-    configurarAlExpirarSesion(cerrarSesion);
-  }, [cerrarSesion]);
+    configurarAlExpirarSesion(() => setUsuario(null));
+  }, []);
 
-  const valor = useMemo(() => {
-    const guardar = (respuesta) =>
-      setSesion({ token: respuesta.token, expiraEn: respuesta.expiraEn, usuario: respuesta.usuario });
-    return {
-      token: sesion?.token,
-      usuario: sesion?.usuario,
-      iniciarSesion: async (email, password) => guardar(await api.post("/auth/login", { email, password })),
-      registrarse: async (datos) => guardar(await api.post("/auth/registro", datos)),
+  const valor = useMemo(
+    () => ({
+      estado,
+      usuario,
+      iniciarSesion: async (email, password) => setUsuario((await api.post("/auth/login", { email, password })).usuario),
+      registrarse: async (datos) => setUsuario((await api.post("/auth/registro", datos)).usuario),
       cerrarSesion,
-    };
-  }, [sesion, cerrarSesion]);
+      olvidarSesion: () => setUsuario(null),
+    }),
+    [estado, usuario, cerrarSesion]
+  );
 
   return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>;
 }

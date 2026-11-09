@@ -50,13 +50,12 @@ public abstract class PruebaDeApi {
 
 	/** Registra a una persona y devuelve su token. */
 	protected String registrar(String email) throws Exception {
-		String respuesta = mockMvc.perform(post("/api/auth/registro")
+		ResultActions respuesta = mockMvc.perform(post("/api/auth/registro")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{"nombre": "Persona de prueba", "email": "%s", "password": "clave-segura-123"}
-								""".formatted(email)))
-				.andReturn().getResponse().getContentAsString();
-		return JsonPath.read(respuesta, "$.token");
+								{"nombre": "Persona de prueba", "email": "%s", "password": "clave-segura-123", "aceptaPolitica": true}
+								""".formatted(email)));
+		return Cookies.tokenDe(respuesta);
 	}
 
 	protected ResultActions pedir(HttpMethod metodo, String ruta, String token) throws Exception {

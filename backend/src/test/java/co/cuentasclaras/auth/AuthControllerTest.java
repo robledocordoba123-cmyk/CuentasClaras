@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,7 +49,7 @@ class AuthControllerTest {
 		return mockMvc.perform(post("/api/auth/registro")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
-						{"nombre": "%s", "email": "%s", "password": "%s"}
+						{"nombre": "%s", "email": "%s", "password": "%s", "aceptaPolitica": true}
 						""".formatted(nombre, email, password)));
 	}
 
@@ -60,7 +62,7 @@ class AuthControllerTest {
 	}
 
 	private String tokenDe(ResultActions respuesta) throws Exception {
-		return JsonPath.read(respuesta.andReturn().getResponse().getContentAsString(), "$.token");
+		return co.cuentasclaras.soporte.Cookies.tokenDe(respuesta);
 	}
 
 	@Nested
@@ -68,11 +70,11 @@ class AuthControllerTest {
 	class Registro {
 
 		@Test
-		void registraYDevuelveTokenSinExponerElHash() throws Exception {
+		void registraYAbreLaSesionEnUnaCookieSinExponerElHash() throws Exception {
 			registrar("Ana Gómez", "ana@correo.com", "clave-segura-123")
 					.andExpect(status().isCreated())
-					.andExpect(jsonPath("$.token").value(not(emptyString())))
-					.andExpect(jsonPath("$.tipo").value("Bearer"))
+					.andExpect(header().string("Set-Cookie", startsWith("cc_sesion=")))
+					.andExpect(jsonPath("$.token").doesNotExist())
 					.andExpect(jsonPath("$.usuario.email").value("ana@correo.com"))
 					.andExpect(jsonPath("$.usuario.passwordHash").doesNotExist());
 		}
@@ -128,7 +130,8 @@ class AuthControllerTest {
 		void conCredencialesCorrectasDevuelveToken() throws Exception {
 			login("ANA@correo.com", "clave-segura-123")
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.token").value(not(emptyString())));
+					.andExpect(header().string("Set-Cookie", startsWith("cc_sesion=")))
+					.andExpect(jsonPath("$.token").doesNotExist());
 		}
 
 		@Test

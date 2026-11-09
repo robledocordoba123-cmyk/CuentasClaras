@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../api/cliente";
-import { useSesion } from "../context/SesionContext";
 import { useDatos } from "../utils/useDatos";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, Modal, Tarjeta } from "../components/ui";
 
 export default function CategoriasPage() {
-  const { token } = useSesion();
   const { datos: categorias, error, recargar } = useDatos("/categorias");
   const [formulario, setFormulario] = useState(null);
   const [errorForm, setErrorForm] = useState({ mensaje: "", campos: {} });
@@ -18,8 +16,8 @@ export default function CategoriasPage() {
     setErrorForm({ mensaje: "", campos: {} });
     const cuerpo = { nombre: formulario.nombre, tipo: formulario.tipo, color: formulario.color };
     try {
-      if (formulario.id) await api.put(`/categorias/${formulario.id}`, cuerpo, token);
-      else await api.post("/categorias", cuerpo, token);
+      if (formulario.id) await api.put(`/categorias/${formulario.id}`, cuerpo);
+      else await api.post("/categorias", cuerpo);
       setFormulario(null);
       recargar();
     } catch (err) {
@@ -31,7 +29,7 @@ export default function CategoriasPage() {
 
   async function eliminar(c) {
     if (!window.confirm(`¿Eliminar la categoría "${c.nombre}"? Si ya tiene movimientos, se archiva.`)) return;
-    await api.delete(`/categorias/${c.id}`, token);
+    await api.delete(`/categorias/${c.id}`);
     recargar();
   }
 
