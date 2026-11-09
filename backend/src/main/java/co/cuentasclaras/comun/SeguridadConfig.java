@@ -1,7 +1,10 @@
 package co.cuentasclaras.comun;
 
 import co.cuentasclaras.auth.JwtProperties;
+import co.cuentasclaras.auth.CookieDeSesion;
 import co.cuentasclaras.auth.TokenService;
+import co.cuentasclaras.auth.ValidadorDeVersionDeSesion;
+import co.cuentasclaras.usuario.UsuarioRepository;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -13,15 +16,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -32,8 +39,10 @@ import java.util.List;
 /**
  * Seguridad de la API.
  *
- * <p>Flujo: la persona hace login y recibe un JWT firmado. En cada petición lo
- * manda en el encabezado {@code Authorization: Bearer <token>}. Spring Security
+ * <p>Flujo: la persona hace login y recibe un JWT firmado dentro de una cookie
+ * HttpOnly ({@link CookieDeSesion}). El navegador la manda sola en cada petición;
+ * también se acepta el encabezado {@code Authorization: Bearer <token>} (Swagger
+ * y pruebas). Spring Security
  * (como "resource server") verifica la firma, la expiración y el emisor antes
  * de que la petición llegue a cualquier controlador. Si algo falla: 401.
  */
@@ -44,15 +53,15 @@ public class SeguridadConfig {
 	@Bean
 	SecurityFilterChain filtroDeSeguridad(HttpSecurity http) throws Exception {
 		return http
-				// API REST con tokens en encabezado: no hay sesión ni cookies,
-				// así que CSRF no aplica.
+				// La cookie es SameSite=Strict: el navegador no la envía desde otro
+				// sitio, así que no hace falta un token CSRF aparte.
 				.cors(cors -> {
 				})
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/actuator/health/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/auth/registro", "/api/auth/login").permitAll()
+						.requestMatchers(HttpMethod.POST, "/api/auth/registro", "/api/auth/login", "/api/auth/logout").permitAll()
 						// Spring redirige los errores internos a /error: debe ser
 						// público para que el cliente vea el 400/404 real y no un 401.
 						.requestMatchers("/error").permitAll()
@@ -96,6 +105,19 @@ public class SeguridadConfig {
 		return fuente;
 	}
 
+	/** Lee el token de la cookie de sesión; si no está, del encabezado Authorization. */
+	@Bean
+	BearerTokenResolver bearerTokenResolver() {
+		DefaultBearerTokenResolver encabezado = new DefaultBearerTokenResolver();
+		return peticion -> {
+			var cookie = WebUtils.getCookie(peticion, CookieDeSesion.NOMBRE);
+			if (cookie != null && !cookie.getValue().isBlank()) {
+				return cookie.getValue();
+			}
+			return encabezado.resolve(peticion);
+		};
+	}
+
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -107,12 +129,15 @@ public class SeguridadConfig {
 	}
 
 	@Bean
-	JwtDecoder jwtDecoder(JwtProperties propiedades) {
+	JwtDecoder jwtDecoder(JwtProperties propiedades, UsuarioRepository usuarioRepository) {
 		NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(clave(propiedades))
 				.macAlgorithm(MacAlgorithm.HS256)
 				.build();
-		// Además de firma y expiración, exige que el token lo hayamos emitido nosotros.
-		decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(TokenService.EMISOR));
+		// Además de firma y expiración, exige que el token lo hayamos emitido
+		// nosotros y que la sesión siga vigente (no cambió la clave ni se borró la cuenta).
+		decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+				JwtValidators.createDefaultWithIssuer(TokenService.EMISOR),
+				new ValidadorDeVersionDeSesion(usuarioRepository)));
 		return decoder;
 	}
 

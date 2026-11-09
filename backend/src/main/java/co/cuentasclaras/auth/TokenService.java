@@ -18,6 +18,8 @@ import java.time.Instant;
 public class TokenService {
 
 	public static final String EMISOR = "cuentasclaras";
+	/** Claim con la versión de sesión de la persona al momento de emitirlo. */
+	public static final String CLAIM_VERSION = "v";
 
 	private final JwtEncoder jwtEncoder;
 	private final JwtProperties jwtProperties;
@@ -39,8 +41,7 @@ public class TokenService {
 				.subject(usuario.getId().toString())
 				.issuedAt(ahora)
 				.expiresAt(expira)
-				.claim("email", usuario.getEmail())
-				.claim("nombre", usuario.getNombre())
+				.claim(CLAIM_VERSION, usuario.getVersionSesion())
 				.build();
 
 		JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();

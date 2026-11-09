@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { PiggyBank, Plus, Trash2 } from "lucide-react";
 import { api } from "../api/cliente";
-import { useSesion } from "../context/SesionContext";
 import { useDatos } from "../utils/useDatos";
 import { formatearPesos, mesActual } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
@@ -15,7 +14,6 @@ const ESTILO_ESTADO = {
 };
 
 export default function PresupuestosPage() {
-  const { token } = useSesion();
   const [mes, setMes] = useState(mesActual());
   const { datos: presupuestos, error, recargar } = useDatos(`/presupuestos?mes=${mes}`);
   const { datos: categorias } = useDatos("/categorias?tipo=GASTO");
@@ -29,7 +27,7 @@ export default function PresupuestosPage() {
     setGuardando(true);
     setErrorForm({ mensaje: "", campos: {} });
     try {
-      await api.put("/presupuestos", { ...formulario, mes, montoLimite: formulario.montoLimite === "" ? null : Number(formulario.montoLimite) }, token);
+      await api.put("/presupuestos", { ...formulario, mes, montoLimite: formulario.montoLimite === "" ? null : Number(formulario.montoLimite) });
       setFormulario(null);
       recargar();
     } catch (err) {
@@ -41,7 +39,7 @@ export default function PresupuestosPage() {
 
   async function eliminar(p) {
     if (!window.confirm(`¿Quitar el presupuesto de ${p.categoria.nombre}?`)) return;
-    await api.delete(`/presupuestos/${p.id}`, token);
+    await api.delete(`/presupuestos/${p.id}`);
     recargar();
   }
 

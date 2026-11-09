@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Coffee, LogIn, Sparkles, UserPlus } from "lucide-react";
 import { useSesion } from "../context/SesionContext";
 import { Logo } from "../components/Layout";
@@ -16,7 +17,7 @@ const MS_ANTES_DE_AVISAR = 4000;
 export default function AccesoPage() {
   const { iniciarSesion, registrarse } = useSesion();
   const [modo, setModo] = useState("login");
-  const [datos, setDatos] = useState({ nombre: "", email: "", password: "" });
+  const [datos, setDatos] = useState({ nombre: "", email: "", password: "", aceptaPolitica: false });
   const [error, setError] = useState("");
   const [errores, setErrores] = useState({});
   const [cargando, setCargando] = useState(false);
@@ -77,6 +78,17 @@ export default function AccesoPage() {
               error={errores.password}
               autoComplete={modo === "login" ? "current-password" : "new-password"}
             />
+
+            {modo === "registro" && (
+              <label className="flex items-start gap-2 text-sm text-slate-600">
+                <input type="checkbox" checked={datos.aceptaPolitica} onChange={(e) => setDatos((d) => ({ ...d, aceptaPolitica: e.target.checked }))}
+                  className="mt-0.5 h-4 w-4 accent-emerald-600" />
+                <span>
+                  Autorizo el tratamiento de mis datos según la <Link to="/privacidad" className="font-medium underline">política de datos</Link>.
+                  {errores.aceptaPolitica && <span className="mt-1 block text-xs text-red-600">{errores.aceptaPolitica}</span>}
+                </span>
+              </label>
+            )}
 
             {despertando && (
               <p className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">

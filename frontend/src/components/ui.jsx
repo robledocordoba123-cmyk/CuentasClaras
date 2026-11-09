@@ -83,8 +83,9 @@ export function Aviso({ tipo = "error", children }) {
   const estilos = {
     error: "bg-red-50 text-red-700 border-red-200",
     info: "bg-sky-50 text-sky-800 border-sky-200",
+    exito: "bg-emerald-50 text-emerald-800 border-emerald-200",
   };
-  return <p className={`rounded-lg border px-3 py-2 text-sm ${estilos[tipo]}`}>{children}</p>;
+  return <p role={tipo === "error" ? "alert" : "status"} className={`rounded-lg border px-3 py-2 text-sm ${estilos[tipo]}`}>{children}</p>;
 }
 
 /** Ventana modal: se cierra con Escape, con la X o haciendo clic afuera. */

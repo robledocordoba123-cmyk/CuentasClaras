@@ -1,7 +1,10 @@
-// Cliente HTTP de la API. Centraliza la URL base, el token y el formato de
-// errores: la API responde siempre con ProblemDetail (RFC 9457), así que el
-// mensaje está en "detail" y los errores por campo en "errores".
-const URL_BASE = import.meta.env.VITE_API_URL || "/api";
+// Cliente HTTP de la API. Siempre llama a /api en la misma dirección de la
+// página: en desarrollo la redirige Vite y al publicar la reenvía Vercel. Así
+// la cookie de sesión (HttpOnly) es del mismo sitio y el navegador la manda
+// sola; el JavaScript nunca ve el token.
+// La API responde siempre con ProblemDetail (RFC 9457): el mensaje está en
+// "detail" y los errores por campo en "errores".
+const URL_BASE = "/api";
 
 export class ErrorDeApi extends Error {
   constructor(estado, mensaje, errores = {}) {
@@ -16,16 +19,15 @@ export function configurarAlExpirarSesion(funcion) {
   alExpirarSesion = funcion;
 }
 
-async function solicitar(ruta, { metodo = "GET", cuerpo, token } = {}) {
-  const cabeceras = {};
-  if (cuerpo !== undefined) cabeceras["Content-Type"] = "application/json";
-  if (token) cabeceras.Authorization = `Bearer ${token}`;
+// Rutas donde un 401 significa "datos incorrectos", no "la sesión venció".
+const RUTAS_DE_ACCESO = ["/auth/login", "/auth/registro", "/auth/yo"];
 
+async function solicitar(ruta, { metodo = "GET", cuerpo } = {}) {
   let respuesta;
   try {
     respuesta = await fetch(`${URL_BASE}${ruta}`, {
       method: metodo,
-      headers: cabeceras,
+      headers: cuerpo !== undefined ? { "Content-Type": "application/json" } : {},
       body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
     });
   } catch {
@@ -36,20 +38,32 @@ async function solicitar(ruta, { metodo = "GET", cuerpo, token } = {}) {
   const datos = await respuesta.json().catch(() => null);
 
   if (!respuesta.ok) {
-    // Token vencido o inválido en una ruta protegida: se cierra la sesión.
-    if (respuesta.status === 401 && token) alExpirarSesion();
-    throw new ErrorDeApi(
-      respuesta.status,
-      datos?.detail || "Ocurrió un error inesperado.",
-      datos?.errores || {}
-    );
+    if (respuesta.status === 401 && !RUTAS_DE_ACCESO.includes(ruta)) alExpirarSesion();
+    throw new ErrorDeApi(respuesta.status, datos?.detail || "Ocurrió un error inesperado.", datos?.errores || {});
   }
   return datos;
 }
 
-/** Descarga un archivo (el CSV) respetando el token. */
-async function descargar(ruta, token, nombreArchivo) {
-  const respuesta = await fetch(`${URL_BASE}${ruta}`, { headers: { Authorization: `Bearer ${token}` } });
+/**
+ * El plan gratuito apaga la API tras un rato sin uso y tarda hasta un par de
+ * minutos en encender. Antes de lo demás se pregunta por su salud, con paciencia.
+ */
+export async function esperarApi({ intentos = 30, esperaMs = 5000 } = {}) {
+  for (let i = 0; i < intentos; i += 1) {
+    try {
+      const respuesta = await fetch(`${URL_BASE}/salud`);
+      if (respuesta.ok) return true;
+    } catch {
+      // Sin conexión o todavía encendiendo: se vuelve a intentar.
+    }
+    await new Promise((listo) => setTimeout(listo, esperaMs));
+  }
+  return false;
+}
+
+/** Descarga un archivo (CSV o JSON) con la sesión actual. */
+async function descargar(ruta, nombreArchivo) {
+  const respuesta = await fetch(`${URL_BASE}${ruta}`);
   if (!respuesta.ok) throw new ErrorDeApi(respuesta.status, "No se pudo descargar el archivo.");
   const enlace = document.createElement("a");
   enlace.href = URL.createObjectURL(await respuesta.blob());
@@ -59,10 +73,10 @@ async function descargar(ruta, token, nombreArchivo) {
 }
 
 export const api = {
-  get: (ruta, token) => solicitar(ruta, { token }),
-  post: (ruta, cuerpo, token) => solicitar(ruta, { metodo: "POST", cuerpo, token }),
-  put: (ruta, cuerpo, token) => solicitar(ruta, { metodo: "PUT", cuerpo, token }),
-  patch: (ruta, cuerpo, token) => solicitar(ruta, { metodo: "PATCH", cuerpo, token }),
-  delete: (ruta, token) => solicitar(ruta, { metodo: "DELETE", token }),
+  get: (ruta) => solicitar(ruta),
+  post: (ruta, cuerpo) => solicitar(ruta, { metodo: "POST", cuerpo }),
+  put: (ruta, cuerpo) => solicitar(ruta, { metodo: "PUT", cuerpo }),
+  patch: (ruta, cuerpo) => solicitar(ruta, { metodo: "PATCH", cuerpo }),
+  delete: (ruta, cuerpo) => solicitar(ruta, { metodo: "DELETE", cuerpo }),
   descargar,
 };

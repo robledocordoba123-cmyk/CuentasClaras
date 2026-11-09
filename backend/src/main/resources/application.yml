@@ -57,5 +57,9 @@ cuentasclaras:
     secreto: ${JWT_SECRET:}
     duracion: ${JWT_DURACION:8h}
 
+  # Cookie de sesión solo por HTTPS. El perfil local la apaga para http://localhost.
+  cookie-segura: ${COOKIE_SEGURA:true}
+
   # Orígenes que pueden llamar a la API desde el navegador (CORS), separados por coma.
+  # Con Vercel reenviando /api ya no hace falta, pero se deja para desarrollo.
   cors-origen: ${CORS_ORIGIN:}

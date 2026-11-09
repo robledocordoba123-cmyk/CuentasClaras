@@ -23,14 +23,13 @@ class DatosDeDemoTest extends PruebaDeApi {
 	DatosDeDemo datosDeDemo;
 
 	private String loginDemo() throws Exception {
-		String respuesta = mockMvc.perform(post("/api/auth/login")
+		var respuesta = mockMvc.perform(post("/api/auth/login")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{"email": "%s", "password": "%s"}
 								""".formatted(DatosDeDemo.EMAIL, DatosDeDemo.PASSWORD)))
-				.andExpect(status().isOk())
-				.andReturn().getResponse().getContentAsString();
-		return JsonPath.read(respuesta, "$.token");
+				.andExpect(status().isOk());
+		return co.cuentasclaras.soporte.Cookies.tokenDe(respuesta);
 	}
 
 	@Test

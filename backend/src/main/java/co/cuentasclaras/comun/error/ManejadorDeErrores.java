@@ -66,6 +66,11 @@ public class ManejadorDeErrores extends ResponseEntityExceptionHandler {
 		return problema(HttpStatus.UNAUTHORIZED, "No autenticado", ex.getMessage());
 	}
 
+	@ExceptionHandler(DemasiadosIntentosException.class)
+	ProblemDetail demasiadosIntentos(DemasiadosIntentosException ex) {
+		return problema(HttpStatus.TOO_MANY_REQUESTS, "Demasiados intentos", ex.getMessage());
+	}
+
 	/** @Valid falló: se devuelve qué campo está mal y por qué. */
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,

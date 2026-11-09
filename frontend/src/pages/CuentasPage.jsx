@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Archive, ArrowLeftRight, Banknote, Landmark, Pencil, Plus, RotateCcw, Smartphone, Wallet } from "lucide-react";
 import { api } from "../api/cliente";
-import { useSesion } from "../context/SesionContext";
 import { useDatos } from "../utils/useDatos";
 import { NOMBRES_TIPO_CUENTA, formatearPesos, hoyISO } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
@@ -9,7 +8,6 @@ import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } f
 const ICONOS = { EFECTIVO: Banknote, BILLETERA_DIGITAL: Smartphone, BANCO: Landmark };
 
 export default function CuentasPage() {
-  const { token } = useSesion();
   const [verArchivadas, setVerArchivadas] = useState(false);
   const { datos: cuentas, error, recargar } = useDatos(`/cuentas?incluirArchivadas=${verArchivadas}`);
 
@@ -39,7 +37,7 @@ export default function CuentasPage() {
     e.preventDefault();
     const cuerpo = { nombre: cuenta.nombre, tipo: cuenta.tipo, saldoInicial: cuenta.saldoInicial === "" ? null : Number(cuenta.saldoInicial) };
     ejecutar(
-      () => (cuenta.id ? api.put(`/cuentas/${cuenta.id}`, cuerpo, token) : api.post("/cuentas", cuerpo, token)),
+      () => (cuenta.id ? api.put(`/cuentas/${cuenta.id}`, cuerpo) : api.post("/cuentas", cuerpo)),
       () => setCuenta(null)
     );
   }
@@ -47,20 +45,20 @@ export default function CuentasPage() {
   function guardarTransferencia(e) {
     e.preventDefault();
     ejecutar(
-      () => api.post("/transferencias", { ...transferencia, monto: transferencia.monto === "" ? null : Number(transferencia.monto) }, token),
+      () => api.post("/transferencias", { ...transferencia, monto: transferencia.monto === "" ? null : Number(transferencia.monto) }),
       () => setTransferencia(null)
     );
   }
 
   async function archivarOEliminar(c) {
     if (!window.confirm(`¿Eliminar la cuenta "${c.nombre}"? Si ya tiene movimientos, se archiva y conservas su historial.`)) return;
-    await api.delete(`/cuentas/${c.id}`, token);
+    await api.delete(`/cuentas/${c.id}`);
     recargar();
   }
 
   async function restaurar(c) {
     try {
-      await api.patch(`/cuentas/${c.id}/restaurar`, undefined, token);
+      await api.patch(`/cuentas/${c.id}/restaurar`);
       recargar();
     } catch (e) {
       window.alert(e.message);

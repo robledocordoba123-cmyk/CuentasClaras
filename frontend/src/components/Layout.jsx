@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { ArrowLeftRight, LayoutDashboard, LogOut, PiggyBank, Tags, Wallet } from "lucide-react";
 import { useSesion } from "../context/SesionContext";
 
@@ -58,13 +58,15 @@ export default function Layout() {
           </nav>
 
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
-            <div className="hidden text-right leading-tight sm:block">
-              <p className="max-w-40 truncate text-sm font-semibold text-slate-900">{usuario?.nombre}</p>
-              <p className="max-w-40 truncate text-xs text-slate-500">{usuario?.email}</p>
-            </div>
-            <span className="grid h-9 w-9 place-items-center rounded-full border border-slate-300 bg-slate-100 text-xs font-bold text-brillo">
-              {iniciales(usuario?.nombre)}
-            </span>
+            <Link to="/perfil" className="flex items-center gap-2 rounded-full p-1 hover:bg-slate-100" title="Tu cuenta">
+              <div className="hidden text-right leading-tight sm:block">
+                <p className="max-w-40 truncate text-sm font-semibold text-slate-900">{usuario?.nombre}</p>
+                <p className="max-w-40 truncate text-xs text-slate-500">{usuario?.email}</p>
+              </div>
+              <span className="grid h-9 w-9 place-items-center rounded-full border border-slate-300 bg-slate-100 text-xs font-bold text-brillo" aria-label="Tu cuenta">
+                {iniciales(usuario?.nombre)}
+              </span>
+            </Link>
             <button
               onClick={cerrarSesion}
               className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-red-600"
