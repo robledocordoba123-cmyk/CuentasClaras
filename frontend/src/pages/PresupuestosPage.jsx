@@ -5,12 +5,13 @@ import { useDatos } from "../utils/useDatos";
 import { formatearPesos, mesActual } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
 import SelectorMes from "../components/SelectorMes";
+import Sobre from "../components/Sobre";
 
 // Semáforo de HU-07: los mismos umbrales que calcula la API (80 % y 100 %).
 const ESTILO_ESTADO = {
-  EN_CONTROL: { barra: "bg-emerald-500", etiqueta: "bg-emerald-50 text-emerald-700", texto: "En control" },
-  ALERTA: { barra: "bg-amber-500", etiqueta: "bg-amber-50 text-amber-700", texto: "Alerta" },
-  EXCEDIDO: { barra: "bg-red-500", etiqueta: "bg-red-50 text-red-700", texto: "Excedido" },
+  EN_CONTROL: { barra: "bg-billete-100", etiqueta: "bg-emerald-50 text-emerald-700", texto: "En control" },
+  ALERTA: { barra: "bg-billete-5", etiqueta: "bg-amber-50 text-amber-700", texto: "Alerta" },
+  EXCEDIDO: { barra: "bg-billete-10", etiqueta: "bg-red-50 text-red-700", texto: "Excedido" },
 };
 
 export default function PresupuestosPage() {
@@ -47,7 +48,7 @@ export default function PresupuestosPage() {
     <div>
       <EncabezadoPagina
         titulo="Presupuestos"
-        subtitulo="Ponle un tope a cada categoría; te avisamos desde el 80 %."
+        subtitulo="Un sobre por categoría: empieza lleno y se vacía al gastar. Te avisamos cuando le quede el 20 %."
         accion={
           <div className="flex flex-wrap gap-2">
             <SelectorMes mes={mes} alCambiar={setMes} />
@@ -73,32 +74,30 @@ export default function PresupuestosPage() {
         <div className="grid gap-4 md:grid-cols-2">
           {presupuestos.map((p) => {
             const estilo = ESTILO_ESTADO[p.estado];
+            const usado = Number(p.porcentajeUsado);
+            const excedido = Number(p.disponible) < 0;
             return (
-              <div key={p.id} className="rounded-2xl border border-slate-200 bg-panel p-5 shadow-sm">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-2 font-medium text-slate-900">
-                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: p.categoria.color }} />
-                    {p.categoria.nombre}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${estilo.etiqueta}`}>{estilo.texto}</span>
-                    <button onClick={() => eliminar(p)} className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label="Eliminar">
-                      <Trash2 size={15} />
-                    </button>
+              <article key={p.id} className="flex gap-3 rounded-2xl border border-slate-200 bg-panel p-4 sm:gap-4">
+                <Sobre color={p.categoria.color} restante={1 - usado / 100} excedido={excedido} className="h-16 w-20 shrink-0 sm:h-24 sm:w-28" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
+                    <h2 className="font-display text-lg font-semibold text-slate-900">{p.categoria.nombre}</h2>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${estilo.etiqueta}`}>{estilo.texto}</span>
+                      <button onClick={() => eliminar(p)} className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label={`Quitar el sobre de ${p.categoria.nombre}`}>
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className={`cifra mt-1 text-2xl font-semibold ${excedido ? "text-red-700" : "text-slate-900"}`}>
+                    {excedido ? `−${formatearPesos(-p.disponible)}` : formatearPesos(p.disponible)}
+                  </p>
+                  <p className="text-sm text-slate-500">{excedido ? "te pasaste" : "quedan en el sobre"} · gastado {formatearPesos(p.gastado)} de {formatearPesos(p.montoLimite)}</p>
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label={`Usado del sobre de ${p.categoria.nombre}`} aria-valuenow={Math.round(usado)} aria-valuemin={0} aria-valuemax={100}>
+                    <div className={`h-full rounded-full ${estilo.barra}`} style={{ width: `${Math.min(usado, 100)}%` }} />
                   </div>
                 </div>
-                <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-valuenow={Number(p.porcentajeUsado)} aria-valuemin={0} aria-valuemax={100}>
-                  <div className={`h-full rounded-full ${estilo.barra}`} style={{ width: `${Math.min(Number(p.porcentajeUsado), 100)}%` }} />
-                </div>
-                <div className="mt-2 flex justify-between text-sm">
-                  <span className="text-slate-600">
-                    {formatearPesos(p.gastado)} de {formatearPesos(p.montoLimite)}
-                  </span>
-                  <span className={Number(p.disponible) < 0 ? "font-medium text-red-600" : "text-slate-500"}>
-                    {Number(p.disponible) < 0 ? `Te pasaste ${formatearPesos(-p.disponible)}` : `Quedan ${formatearPesos(p.disponible)}`}
-                  </span>
-                </div>
-              </div>
+              </article>
             );
           })}
         </div>

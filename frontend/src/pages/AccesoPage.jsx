@@ -4,6 +4,8 @@ import { Coffee, LogIn, Sparkles, UserPlus } from "lucide-react";
 import { useSesion } from "../context/SesionContext";
 import { Logo } from "../components/Layout";
 import { Aviso, Boton, Campo } from "../components/ui";
+import Guilloche from "../components/Guilloche";
+import Sobre from "../components/Sobre";
 
 // Solo en la demo pública (VITE_MODO_DEMO=true): acceso de un clic a una
 // cuenta con datos de ejemplo, para que quien visite pueda probar sin registrarse.
@@ -58,7 +60,7 @@ export default function AccesoPage() {
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
           <Logo />
-          <h1 className="mt-10 text-2xl font-bold text-slate-900">
+          <h1 className="mt-10 text-4xl font-semibold text-slate-900">
             {modo === "login" ? "Inicia sesión" : "Crea tu cuenta"}
           </h1>
           <p className="mb-6 mt-1 text-sm text-slate-500">
@@ -82,7 +84,7 @@ export default function AccesoPage() {
             {modo === "registro" && (
               <label className="flex items-start gap-2 text-sm text-slate-600">
                 <input type="checkbox" checked={datos.aceptaPolitica} onChange={(e) => setDatos((d) => ({ ...d, aceptaPolitica: e.target.checked }))}
-                  className="mt-0.5 h-4 w-4 accent-emerald-600" />
+                  className="mt-0.5 h-4 w-4 accent-[#0f7a8a]" />
                 <span>
                   Autorizo el tratamiento de mis datos según la <Link to="/privacidad" className="font-medium underline">política de datos</Link>.
                   {errores.aceptaPolitica && <span className="mt-1 block text-xs text-red-600">{errores.aceptaPolitica}</span>}
@@ -91,7 +93,7 @@ export default function AccesoPage() {
             )}
 
             {despertando && (
-              <p className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              <p className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800" role="status">
                 <Coffee size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
                 El servidor estaba en reposo y está encendiendo. La primera entrada puede tardar hasta un minuto.
               </p>
@@ -104,7 +106,7 @@ export default function AccesoPage() {
           </form>
 
           {MODO_DEMO && modo === "login" && (
-            <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-panel p-4">
               <p className="text-sm font-medium text-slate-900">¿Solo quieres probarla?</p>
               <p className="mb-3 mt-0.5 text-xs text-slate-600">Entra a una cuenta con tres meses de datos de ejemplo.</p>
               <Boton
@@ -122,7 +124,7 @@ export default function AccesoPage() {
           <p className="mt-6 text-sm text-slate-600">
             {modo === "login" ? "¿No tienes cuenta? " : "¿Ya tienes cuenta? "}
             <button
-              className="font-medium text-emerald-700 hover:underline"
+              className="font-semibold text-brillo hover:underline"
               onClick={() => {
                 setModo(modo === "login" ? "registro" : "login");
                 setError("");
@@ -135,37 +137,31 @@ export default function AccesoPage() {
         </div>
       </div>
 
-      <div className="relative hidden flex-col justify-between overflow-hidden border-l border-slate-200 bg-panel p-12 lg:flex">
-        <div className="pointer-events-none absolute -right-24 top-10 h-96 w-96 rounded-full bg-brillo/15 blur-3xl" />
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-tinta p-12 text-white lg:flex">
+        <Guilloche color="#3ec3d4" className="pointer-events-none absolute -right-40 -top-40 h-[42rem] w-[42rem]" opacidad={0.28} />
+        <Guilloche color="#b7791f" lineas={10} ondas={12} className="pointer-events-none absolute -bottom-56 -left-40 h-[34rem] w-[34rem]" opacidad={0.22} />
 
-        {/* Una "tarjeta" con el saldo, como la de una app de banco. */}
-        <div className="relative mx-auto mt-16 w-full max-w-sm rotate-[-4deg] rounded-3xl border border-emerald-200 bg-[linear-gradient(135deg,#123a2b,#0c1210_70%)] p-6 shadow-[0_30px_80px_rgb(0_0_0/0.6)]">
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>Saldo en tus cuentas</span>
-            <span className="font-semibold text-brillo">+12,4 % este mes</span>
-          </div>
-          <p className="mt-3 font-display text-4xl font-semibold tracking-tight text-slate-900">$ 3.018.700</p>
-          <div className="mt-6 grid grid-cols-3 gap-2 text-xs">
-            {[
-              ["Efectivo", "$ 412.000"],
-              ["Nequi", "$ 689.700"],
-              ["Banco", "$ 1.917.000"],
-            ].map(([cuenta, saldo]) => (
-              <div key={cuenta} className="rounded-xl border border-slate-200 bg-black/20 p-2.5">
-                <p className="text-slate-500">{cuenta}</p>
-                <p className="mt-0.5 font-semibold text-slate-800">{saldo}</p>
-              </div>
-            ))}
-          </div>
+        {/* Tres sobres del mes: el de mercado casi lleno, el de domicilios a medias y el de salidas vacío. */}
+        <div className="relative mx-auto mt-10 grid w-full max-w-md grid-cols-3 gap-4" aria-hidden="true">
+          {[
+            ["Mercado", "#d9622b", 0.8, false],
+            ["Domicilios", "#c23b5a", 0.35, false],
+            ["Salidas", "#6a4fc2", 0, true],
+          ].map(([nombre, color, restante, excedido]) => (
+            <div key={nombre} className="rounded-2xl bg-white/95 p-3 text-center text-slate-800">
+              <Sobre color={color} restante={restante} excedido={excedido} className="mx-auto h-20 w-24" />
+              <p className="mt-1 text-xs font-semibold">{nombre}</p>
+            </div>
+          ))}
         </div>
 
         <div className="relative">
-          <p className="font-display text-3xl font-semibold leading-snug text-slate-900">
-            “Cuentas claras, <span className="text-brillo">amistades largas</span>.”
+          <p className="font-display text-4xl font-semibold leading-tight">
+            “Cuentas claras, <span className="italic text-[#7fd6e1]">amistades largas</span>.”
           </p>
-          <p className="mt-4 max-w-md text-slate-500">
-            Efectivo, Nequi, Daviplata y el banco en un solo lugar. Ponte un presupuesto por categoría y la app te avisa antes
-            de que te pases.
+          <p className="mt-4 max-w-md text-slate-300">
+            Reparte la plata del mes en sobres, como se ha hecho siempre: efectivo, Nequi, Daviplata y el banco en un solo lugar,
+            y un aviso antes de que un sobre se quede vacío.
           </p>
         </div>
       </div>
