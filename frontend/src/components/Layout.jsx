@@ -10,11 +10,22 @@ const OPCIONES = [
   { a: "/categorias", texto: "Categorías", icono: Tags },
 ];
 
+// El logo: un sobre cuya solapa es un chulo. Cuentas claras = cuentas en orden.
+export function Marca({ className = "h-8 w-8" }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true" focusable="false">
+      <rect width="32" height="32" rx="8" fill="#16181d" />
+      <path d="M6.5 11.5h19v12a2 2 0 0 1-2 2h-15a2 2 0 0 1-2-2z" fill="none" stroke="#f3f4ef" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M8.5 13.5l5 5 10-10" fill="none" stroke="#3ec3d4" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function Logo() {
   return (
     <div className="flex items-center gap-2">
-      <img src="/favicon.svg" alt="" className="h-8 w-8" />
-      <span className="font-display text-lg font-semibold tracking-tight text-slate-900">
+      <Marca />
+      <span className="font-display text-xl font-semibold tracking-tight text-slate-900">
         Cuentas<span className="text-brillo">Claras</span>
       </span>
     </div>
@@ -36,11 +47,11 @@ export default function Layout() {
   return (
     <div className="min-h-screen">
       {/* Barra superior: logo, menú en forma de cápsula flotante y usuario. */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-fondo/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-fondo/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 lg:px-8">
           <Logo />
 
-          <nav className="mx-auto hidden items-center gap-1 rounded-full border border-slate-200 bg-panel p-1 lg:flex">
+          <nav className="mx-auto hidden items-center gap-1 rounded-full border border-slate-200 bg-panel p-1 lg:flex" aria-label="Secciones">
             {OPCIONES.map(({ a, texto, icono: Icono }) => (
               <NavLink
                 key={a}
@@ -48,7 +59,7 @@ export default function Layout() {
                 end={a === "/"}
                 className={({ isActive }) =>
                   `flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-                    isActive ? "bg-brillo text-fondo shadow-[0_0_20px_rgb(61_242_162/0.35)]" : "text-slate-500 hover:text-slate-900"
+                    isActive ? "bg-tinta text-white" : "text-slate-600 hover:text-slate-900"
                   }`
                 }
               >
@@ -63,7 +74,7 @@ export default function Layout() {
                 <p className="max-w-40 truncate text-sm font-semibold text-slate-900">{usuario?.nombre}</p>
                 <p className="max-w-40 truncate text-xs text-slate-500">{usuario?.email}</p>
               </div>
-              <span className="grid h-9 w-9 place-items-center rounded-full border border-slate-300 bg-slate-100 text-xs font-bold text-brillo" aria-label="Tu cuenta">
+              <span className="grid h-9 w-9 place-items-center rounded-full border border-slate-300 bg-slate-100 text-xs font-bold text-slate-800" aria-label="Tu cuenta">
                 {iniciales(usuario?.nombre)}
               </span>
             </Link>
@@ -84,7 +95,7 @@ export default function Layout() {
       </main>
 
       {/* Menú inferior flotante en celular */}
-      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-2xl border border-slate-200 bg-panel/90 p-1 backdrop-blur-xl lg:hidden">
+      <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-2xl border border-slate-200 bg-panel/95 p-1 shadow-lg backdrop-blur-xl lg:hidden" aria-label="Secciones">
         {OPCIONES.map(({ a, texto, icono: Icono }) => (
           <NavLink
             key={a}
@@ -92,7 +103,7 @@ export default function Layout() {
             end={a === "/"}
             className={({ isActive }) =>
               `flex flex-col items-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold ${
-                isActive ? "bg-brillo text-fondo" : "text-slate-500"
+                isActive ? "bg-tinta text-white" : "text-slate-600"
               }`
             }
           >

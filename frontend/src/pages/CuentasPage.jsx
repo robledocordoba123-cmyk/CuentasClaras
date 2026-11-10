@@ -6,6 +6,8 @@ import { NOMBRES_TIPO_CUENTA, formatearPesos, hoyISO } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
 
 const ICONOS = { EFECTIVO: Banknote, BILLETERA_DIGITAL: Smartphone, BANCO: Landmark };
+// Efectivo en verde (100 mil), billeteras en violeta (50 mil), banco en turquesa (2 mil).
+const TONOS = { EFECTIVO: "bg-billete-100/12 text-billete-100", BILLETERA_DIGITAL: "bg-billete-50/12 text-billete-50", BANCO: "bg-billete-2/12 text-billete-2" };
 
 export default function CuentasPage() {
   const [verArchivadas, setVerArchivadas] = useState(false);
@@ -110,7 +112,7 @@ export default function CuentasPage() {
             return (
               <div key={c.id} className={`rounded-2xl border bg-panel p-5 shadow-sm ${c.archivada ? "border-dashed border-slate-300 opacity-70" : "border-slate-200"}`}>
                 <div className="flex items-start justify-between">
-                  <span className="rounded-lg bg-emerald-50 p-2 text-brillo">
+                  <span className={`rounded-xl p-2.5 ${TONOS[c.tipo]}`}>
                     <Icono size={20} aria-hidden="true" />
                   </span>
                   <div className="flex">
@@ -142,7 +144,7 @@ export default function CuentasPage() {
                   {NOMBRES_TIPO_CUENTA[c.tipo]}
                   {c.archivada && " · Archivada"}
                 </p>
-                <p className={`mt-3 text-2xl font-bold ${Number(c.saldoActual) < 0 ? "text-red-600" : "text-slate-900"}`}>{formatearPesos(c.saldoActual)}</p>
+                <p className={`cifra mt-3 text-3xl font-semibold ${Number(c.saldoActual) < 0 ? "text-red-600" : "text-slate-900"}`}>{formatearPesos(c.saldoActual)}</p>
               </div>
             );
           })}

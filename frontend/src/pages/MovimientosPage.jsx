@@ -124,7 +124,7 @@ export default function MovimientosPage() {
                 <li key={m.id} className="flex items-center gap-3 px-4 py-3">
                   <span
                     className="h-9 w-9 shrink-0 rounded-full"
-                    style={{ backgroundColor: esTransferencia ? "#94a3b8" : m.categoria.color }}
+                    style={{ backgroundColor: esTransferencia ? "#c9cec5" : m.categoria.color }}
                     aria-hidden="true"
                   />
                   <div className="min-w-0 flex-1">
@@ -135,7 +135,7 @@ export default function MovimientosPage() {
                       {esTransferencia ? (esEntrada ? "Entrada" : "Salida") : m.categoria.nombre} · {m.cuenta.nombre} · {formatearFecha(m.fecha)}
                     </p>
                   </div>
-                  <span className={`shrink-0 font-semibold ${esTransferencia ? "text-slate-500" : esEntrada ? "text-brillo" : "text-slate-900"}`}>
+                  <span className={`shrink-0 font-semibold ${esTransferencia ? "text-slate-500" : esEntrada ? "text-emerald-700" : "text-slate-900"}`}>
                     {esEntrada ? "+" : "−"}
                     {formatearPesos(m.monto)}
                   </span>

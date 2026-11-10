@@ -94,7 +94,7 @@ public class DatosDeDemo implements ApplicationRunner {
 		Cuenta banco = cuentaRepository.save(new Cuenta(u, "Bancolombia", TipoCuenta.BANCO, new BigDecimal("800000")));
 		Cuenta nequi = cuentaRepository.save(new Cuenta(u, "Nequi", TipoCuenta.BILLETERA_DIGITAL, new BigDecimal("150000")));
 		Cuenta efectivo = cuentaRepository.save(new Cuenta(u, "Efectivo", TipoCuenta.EFECTIVO, new BigDecimal("60000")));
-		Categoria mascotas = categoriaRepository.save(new Categoria(u, "Mascotas", TipoCategoria.GASTO, "#F59E0B"));
+		Categoria mascotas = categoriaRepository.save(new Categoria(u, "Mascotas", TipoCategoria.GASTO, "#8C5A3C"));
 
 		// Semilla fija: la demo sale igual en cada arranque (con fechas al día).
 		Random azar = new Random(2026);

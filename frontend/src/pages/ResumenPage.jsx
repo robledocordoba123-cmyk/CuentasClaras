@@ -6,38 +6,44 @@ import { useDatos } from "../utils/useDatos";
 import { formatearPesos, formatearPorcentaje, mesActual, nombreMes } from "../utils/formato";
 import { Aviso, Cargando, EncabezadoPagina, EstadoVacio, Tarjeta } from "../components/ui";
 import SelectorMes from "../components/SelectorMes";
+import Guilloche from "../components/Guilloche";
 
-// Tooltip de las gráficas en el tema oscuro.
+// Ingresos en verde (billete de 100 mil) y gastos en carmín (billete de 10 mil).
+const COLOR_INGRESOS = "#2d7d55";
+const COLOR_GASTOS = "#c23b5a";
+
 const ESTILO_TOOLTIP = {
-  contentStyle: { background: "#121a17", border: "1px solid #2f3d38", borderRadius: 12, color: "#f2f6f4" },
-  itemStyle: { color: "#dce4e0" },
-  labelStyle: { color: "#8a9a93" },
-  cursor: { fill: "rgb(61 242 162 / 0.06)" },
+  contentStyle: { background: "#ffffff", border: "1px solid #e2e5de", borderRadius: 12, color: "#16181d", boxShadow: "0 8px 24px rgb(22 24 29 / 0.08)" },
+  itemStyle: { color: "#24272a" },
+  labelStyle: { color: "#5a6058" },
+  cursor: { fill: "rgb(22 24 29 / 0.04)" },
 };
 
 // Formato corto para los ejes de las gráficas: $1,2 M / $350 mil.
 const pesosCortos = (valor) =>
   valor >= 1_000_000 ? `$${(valor / 1_000_000).toLocaleString("es-CO", { maximumFractionDigits: 1 })} M` : `$${Math.round(valor / 1000)} mil`;
 
-// El saldo total es la cifra principal: va grande, con el brillo verde de la marca.
+// El saldo total es la cifra principal, presentado como un billete: fondo grafito,
+// guilloche turquesa y la cifra en la serif de grabado.
 function SaldoPrincipal({ valor, cuentas }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-[linear-gradient(135deg,#0f2a1f,#0f1513_60%)] p-5 col-span-2">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-brillo/20 blur-3xl" />
-      <p className="flex items-center gap-2 text-sm font-medium text-emerald-700">
+    <div className="relative col-span-2 overflow-hidden rounded-2xl bg-tinta p-6 text-white">
+      <Guilloche color="#3ec3d4" className="pointer-events-none absolute -right-24 -top-32 h-80 w-80" opacidad={0.32} />
+      <div className="pointer-events-none absolute inset-2 rounded-xl border border-white/10" aria-hidden="true" />
+      <p className="relative flex items-center gap-2 text-sm font-medium text-[#9fdde6]">
         <Wallet size={16} aria-hidden="true" /> Saldo en tus cuentas
       </p>
-      <p className="mt-2 font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{formatearPesos(valor)}</p>
-      <p className="mt-1 text-xs text-slate-500">Suma de {cuentas} cuentas: efectivo, billeteras y banco</p>
+      <p className="cifra relative mt-2 text-4xl font-semibold sm:text-5xl">{formatearPesos(valor)}</p>
+      <p className="relative mt-2 text-xs text-slate-300">Suma de {cuentas} cuentas: efectivo, billeteras y banco</p>
     </div>
   );
 }
 
 function Indicador({ titulo, valor, icono: Icono, tono }) {
   const tonos = {
-    verde: "bg-emerald-50 text-brillo",
-    rojo: "bg-red-50 text-red-600",
-    azul: "bg-sky-50 text-sky-600",
+    verde: "bg-emerald-50 text-emerald-700",
+    rojo: "bg-red-50 text-red-700",
+    azul: "bg-sky-50 text-sky-800",
     gris: "bg-slate-100 text-slate-600",
   };
   return (
@@ -46,7 +52,7 @@ function Indicador({ titulo, valor, icono: Icono, tono }) {
         <Icono size={18} aria-hidden="true" />
       </div>
       <p className="text-sm text-slate-500">{titulo}</p>
-      <p className="mt-0.5 font-display text-xl font-semibold text-slate-900">{formatearPesos(valor)}</p>
+      <p className="cifra mt-0.5 text-2xl font-semibold text-slate-900">{formatearPesos(valor)}</p>
     </div>
   );
 }
@@ -106,7 +112,7 @@ export default function ResumenPage() {
                   <div className="h-56">
                     <ResponsiveContainer>
                       <PieChart>
-                        <Pie stroke="#0f1513" strokeWidth={2} data={resumen.gastosPorCategoria} dataKey="total" nameKey="categoria.nombre" innerRadius="55%" outerRadius="90%" paddingAngle={2}>
+                        <Pie stroke="#ffffff" strokeWidth={2} data={resumen.gastosPorCategoria} dataKey="total" nameKey="categoria.nombre" innerRadius="55%" outerRadius="90%" paddingAngle={2}>
                           {resumen.gastosPorCategoria.map((g) => (
                             <Cell key={g.categoria.id} fill={g.categoria.color} />
                           ))}
@@ -137,13 +143,13 @@ export default function ResumenPage() {
                 {tendencia && (
                   <ResponsiveContainer>
                     <BarChart data={tendencia.map((t) => ({ ...t, nombre: nombreMes(t.mes, false) }))}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222e2a" />
-                      <XAxis dataKey="nombre" tick={{ fontSize: 12, fill: "#8a9a93" }} axisLine={{ stroke: "#2f3d38" }} tickLine={false} />
-                      <YAxis tickFormatter={pesosCortos} tick={{ fontSize: 11, fill: "#8a9a93" }} axisLine={false} tickLine={false} width={70} />
+                      <CartesianGrid vertical={false} stroke="#e2e5de" />
+                      <XAxis dataKey="nombre" tick={{ fontSize: 12, fill: "#5a6058" }} axisLine={{ stroke: "#c9cec5" }} tickLine={false} />
+                      <YAxis tickFormatter={pesosCortos} tick={{ fontSize: 11, fill: "#5a6058" }} axisLine={false} tickLine={false} width={70} />
                       <Tooltip formatter={(valor) => formatearPesos(valor)} {...ESTILO_TOOLTIP} />
                       <Legend wrapperStyle={{ fontSize: 13 }} />
-                      <Bar dataKey="ingresos" name="Ingresos" fill="#3df2a2" radius={[6, 6, 0, 0]} />
-                      <Bar dataKey="gastos" name="Gastos" fill="#ff7a7a" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey="ingresos" name="Ingresos" fill={COLOR_INGRESOS} radius={[4, 4, 0, 0]} maxBarSize={28} />
+                      <Bar dataKey="gastos" name="Gastos" fill={COLOR_GASTOS} radius={[4, 4, 0, 0]} maxBarSize={28} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}

@@ -26,7 +26,7 @@ public final class CategoriaDtos {
 
 		public CategoriaRequest {
 			nombre = nombre == null ? null : nombre.strip();
-			color = (color == null || color.isBlank()) ? "#6366F1" : color.toUpperCase();
+			color = (color == null || color.isBlank()) ? "#138A9C" : color.toUpperCase();
 		}
 	}
 

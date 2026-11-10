@@ -1,57 +1,75 @@
 @import "tailwindcss";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/albert-sans";
 
 /*
-  Identidad visual: una app financiera en modo oscuro.
-  Fondo casi negro con tinte verde, paneles un tono más claro, verde esmeralda brillante para la plata
-  y cifras alineadas (tabular-nums) para que los montos se lean como en un extracto.
-  La escala "slate" se invierte (50 es oscuro, 900 es casi blanco) y los tonos suaves de alerta
-  (50 a 200) pasan a ser fondos oscuros teñidos, así el resto del código no cambia de clases.
+  Identidad de CuentasClaras: "sobres".
+  Como el método de repartir la plata del mes en sobres: cada presupuesto es un sobre
+  que se va vaciando al gastar. Fondo claro de papel de seguridad, texto grafito, cifras
+  en una serif de grabado (Fraunces) y colores tomados de los billetes colombianos:
+  turquesa (2 mil), ocre (5 mil), carmín (10 mil), naranja (20 mil), violeta (50 mil)
+  y verde (100 mil). Solo el color: ningún diseño de billete se copia.
+  Las escalas slate, emerald, red, amber y sky se redefinen aquí, así las pantallas
+  conservan sus clases y todo cambia desde este archivo.
 */
 @theme {
-  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Sora", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Albert Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
 
-  --color-fondo: #070b0a;
-  --color-panel: #0f1513;
-  --color-brillo: #3df2a2;
+  --color-fondo: #f3f4ef;
+  --color-panel: #ffffff;
+  --color-tinta: #16181d;
+  --color-brillo: #0f7a8a;
 
-  --color-slate-50: #121a17;
-  --color-slate-100: #18221e;
-  --color-slate-200: #222e2a;
-  --color-slate-300: #2f3d38;
-  --color-slate-400: #66766f;
-  --color-slate-500: #8a9a93;
-  --color-slate-600: #a8b5af;
-  --color-slate-700: #c4cec9;
-  --color-slate-800: #dce4e0;
-  --color-slate-900: #f2f6f4;
+  --color-billete-2: #138a9c;
+  --color-billete-5: #b7791f;
+  --color-billete-10: #c23b5a;
+  --color-billete-20: #d9622b;
+  --color-billete-50: #6a4fc2;
+  --color-billete-100: #2d7d55;
 
-  --color-emerald-50: #0c2219;
-  --color-emerald-100: #b6f5d6;
-  --color-emerald-200: #134430;
-  --color-emerald-700: #5eecac;
+  /* Grafito: 400 en adelante cumple 4.5:1 sobre blanco y sobre el papel. */
+  --color-slate-50: #f7f8f5;
+  --color-slate-100: #eef0eb;
+  --color-slate-200: #e2e5de;
+  --color-slate-300: #c9cec5;
+  --color-slate-400: #6c736a;
+  --color-slate-500: #5a6058;
+  --color-slate-600: #474c46;
+  --color-slate-700: #353934;
+  --color-slate-800: #24272a;
+  --color-slate-900: #16181d;
 
-  --color-red-50: #2a1214;
-  --color-red-200: #4d1e22;
-  --color-red-600: #ff7a7a;
-  --color-red-700: #ffa3a3;
-  --color-red-800: #ffc2c2;
+  /* Ingresos y lo que va bien: verde del billete de 100 mil. */
+  --color-emerald-50: #e9f3ed;
+  --color-emerald-100: #d3e8db;
+  --color-emerald-200: #b3d7c1;
+  --color-emerald-600: #2d7d55;
+  --color-emerald-700: #23663f;
+  --color-emerald-800: #1b5233;
 
-  --color-amber-50: #2a210c;
-  --color-amber-200: #4d3a12;
-  --color-amber-700: #ffd166;
-  --color-amber-800: #ffe09a;
+  /* Gastos y excedidos: carmín del billete de 10 mil. */
+  --color-red-50: #fbedf0;
+  --color-red-200: #f0c2cc;
+  --color-red-600: #b3304e;
+  --color-red-700: #9b2742;
+  --color-red-800: #7f2036;
 
-  --color-sky-50: #0c1f2b;
-  --color-sky-200: #163a50;
-  --color-sky-600: #5cc8ff;
-  --color-sky-800: #b5e6ff;
+  /* Alertas: ocre del billete de 5 mil. */
+  --color-amber-50: #fbf3e2;
+  --color-amber-200: #ecd49c;
+  --color-amber-700: #85560f;
+  --color-amber-800: #6b450c;
+
+  /* Información: turquesa del billete de 2 mil. */
+  --color-sky-50: #e6f3f5;
+  --color-sky-200: #b3dde4;
+  --color-sky-600: #0f7584;
+  --color-sky-800: #0b5662;
 }
 
 body {
   background-color: var(--color-fondo);
-  background-image: radial-gradient(60rem 30rem at 85% -10%, rgb(61 242 162 / 0.09), transparent 70%);
-  background-attachment: fixed;
   color: var(--color-slate-800);
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
@@ -60,10 +78,29 @@ body {
 h1,
 h2 {
   font-family: var(--font-display);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
-/* Los selectores de fecha y los select nativos también en oscuro. */
+/* Las cifras grandes en la serif, con números de igual ancho para que se alineen. */
+.cifra {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.02em;
+}
+
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+}
+
+/* Quien pide menos movimiento en su sistema no ve transiciones ni animaciones. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

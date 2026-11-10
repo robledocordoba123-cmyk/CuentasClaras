@@ -82,7 +82,7 @@ export default function CategoriasPage() {
             icono={Plus}
             onClick={() => {
               setErrorForm({ mensaje: "", campos: {} });
-              setFormulario({ nombre: "", tipo: "GASTO", color: "#6366F1" });
+              setFormulario({ nombre: "", tipo: "GASTO", color: "#138A9C" });
             }}
           >
             Nueva categoría
@@ -107,10 +107,20 @@ export default function CategoriasPage() {
               <option value="GASTO">Gasto</option>
               <option value="INGRESO">Ingreso</option>
             </Campo>
-            <label className="block text-sm font-medium text-slate-700">
-              Color
-              <input type="color" value={formulario.color} onChange={(e) => setFormulario({ ...formulario, color: e.target.value })} className="mt-1 block h-10 w-20 cursor-pointer rounded border border-slate-300" />
-            </label>
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-700">Color</legend>
+              {/* Los colores de los billetes colombianos, o uno propio. */}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {[["#138A9C", "Turquesa"], ["#B7791F", "Ocre"], ["#C23B5A", "Carmín"], ["#D9622B", "Naranja"], ["#6A4FC2", "Violeta"], ["#2D7D55", "Verde"]].map(([color, nombre]) => (
+                  <button key={color} type="button" onClick={() => setFormulario({ ...formulario, color })} aria-label={nombre} aria-pressed={formulario.color.toUpperCase() === color}
+                    className={`h-8 w-8 rounded-full ring-offset-2 ${formulario.color.toUpperCase() === color ? "ring-2 ring-slate-900" : ""}`} style={{ backgroundColor: color }} />
+                ))}
+                <label className="ml-1 inline-flex items-center gap-2 text-xs text-slate-500">
+                  Otro
+                  <input type="color" value={formulario.color} onChange={(e) => setFormulario({ ...formulario, color: e.target.value })} className="h-8 w-10 cursor-pointer rounded border border-slate-300" />
+                </label>
+              </div>
+            </fieldset>
             {errorForm.mensaje && Object.keys(errorForm.campos).length === 0 && <Aviso>{errorForm.mensaje}</Aviso>}
             <Boton type="submit" disabled={guardando} className="w-full">{guardando ? "Guardando..." : "Guardar"}</Boton>
           </form>
