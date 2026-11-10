@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 // Pestañas entre pantallas hermanas; los grupos están en utils/grupos.js.
 export default function Pestanas({ grupo, etiqueta }) {
   return (
-    <nav aria-label={etiqueta} className="mb-6 flex gap-1 overflow-x-auto border-b border-slate-200">
+    <nav aria-label={etiqueta} className="mb-6 flex gap-1 overflow-x-auto overflow-y-hidden border-b border-slate-200 [scrollbar-width:none]">
       {grupo.map(({ a, texto }) => (
         <NavLink
           key={a}

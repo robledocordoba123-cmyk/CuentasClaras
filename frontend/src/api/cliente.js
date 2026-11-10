@@ -51,8 +51,10 @@ async function solicitar(ruta, { metodo = "GET", cuerpo } = {}) {
 export async function esperarApi({ intentos = 30, esperaMs = 5000 } = {}) {
   for (let i = 0; i < intentos; i += 1) {
     try {
+      // Cualquier respuesta propia del servidor (incluso un 401) significa que ya despertó;
+      // 502 a 504 son del proxy mientras la API enciende.
       const respuesta = await fetch(`${URL_BASE}/salud`);
-      if (respuesta.ok) return true;
+      if (respuesta.status < 502 || respuesta.status > 504) return true;
     } catch {
       // Sin conexión o todavía encendiendo: se vuelve a intentar.
     }

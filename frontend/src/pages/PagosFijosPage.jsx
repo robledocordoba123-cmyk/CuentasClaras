@@ -89,17 +89,18 @@ export default function PagosFijosPage() {
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-center leading-none text-white" style={{ backgroundColor: p.categoria.color }}>
                     <span className="cifra text-lg font-semibold">{new Date(`${p.vence}T12:00:00`).getDate()}</span>
                   </span>
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 basis-40">
                     <p className="font-medium text-slate-900">{p.nombre}{!p.activo && <span className="text-slate-500"> · desactivado</span>}</p>
                     <p className="text-xs text-slate-500">{p.categoria.nombre} · {p.cuenta.nombre} · vence el {formatearFecha(p.vence, { day: "numeric", month: "long" })}</p>
                   </div>
-                  <span className="cifra font-semibold text-slate-900">{formatearPesos(p.montoPagado ?? p.monto)}</span>
+                  <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+                  <span className="cifra mr-auto font-semibold text-slate-900 sm:mr-0">{formatearPesos(p.montoPagado ?? p.monto)}</span>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${estado.clase}`}>{estado.texto}</span>
                   <div className="flex items-center gap-1">
                     {p.estado !== "PAGADO" && p.activo && (
-                      <Boton variante="secundario" icono={CheckCircle2}
+                      <Boton variante="secundario" icono={CheckCircle2} aria-label={`Pagar ${p.nombre}`}
                         onClick={() => { setErrorForm({ mensaje: "", campos: {} }); setPago({ pago: p, monto: String(Number(p.monto)), fecha: mes === mesActual() ? hoyISO() : p.vence }); }}>
-                        Pagar
+                        <span className="hidden sm:inline">Pagar</span>
                       </Boton>
                     )}
                     {p.activo && (
@@ -110,6 +111,7 @@ export default function PagosFijosPage() {
                     <button onClick={() => eliminar(p)} className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label={`Quitar ${p.nombre}`}>
                       <Trash2 size={16} />
                     </button>
+                  </div>
                   </div>
                 </li>
               );
