@@ -1,0 +1,6 @@
+# Solo en producción (Render). Los registros salen en JSON (formato ECS), una línea
+# por evento, para poder filtrarlos y buscarlos en el panel de Render.
+logging:
+  structured:
+    format:
+      console: ecs

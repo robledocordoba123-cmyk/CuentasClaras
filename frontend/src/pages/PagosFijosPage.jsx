@@ -5,6 +5,7 @@ import { useDatos } from "../utils/useDatos";
 import { formatearFecha, formatearPesos, hoyISO, mesActual } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
 import SelectorMes from "../components/SelectorMes";
+import { textoSobre } from "../utils/colores";
 import Pestanas from "../components/Pestanas";
 import { GRUPO_MOVIMIENTOS } from "../utils/grupos";
 
@@ -86,7 +87,7 @@ export default function PagosFijosPage() {
               const estado = ESTADOS[p.estado];
               return (
                 <li key={p.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-center leading-none text-white" style={{ backgroundColor: p.categoria.color }}>
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-center leading-none" style={{ backgroundColor: p.categoria.color, color: textoSobre(p.categoria.color) }}>
                     <span className="cifra text-lg font-semibold">{new Date(`${p.vence}T12:00:00`).getDate()}</span>
                   </span>
                   <div className="min-w-0 flex-1 basis-40">

@@ -14,4 +14,10 @@ export default defineConfig({
       '/api': process.env.API_URL ?? 'http://localhost:8080',
     },
   },
+  // Pruebas de pantallas con Vitest, en un navegador simulado (jsdom).
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/pruebas/preparar.js',
+    include: ['src/**/*.test.{js,jsx}'],
+  },
 })
