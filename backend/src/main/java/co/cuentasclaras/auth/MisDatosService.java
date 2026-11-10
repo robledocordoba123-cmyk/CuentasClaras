@@ -41,6 +41,20 @@ public class MisDatosService {
 		datos.put("movimientos", lista("""
 				SELECT id, cuenta_id, categoria_id, tipo, monto, fecha, descripcion, transferencia_id, creado_en
 				FROM movimientos WHERE usuario_id = ? ORDER BY fecha, creado_en""", usuarioId));
+		datos.put("personas", lista("SELECT id, nombre, creado_en FROM personas WHERE usuario_id = ? ORDER BY nombre", usuarioId));
+		datos.put("deudas", lista("""
+				SELECT d.id, d.persona_id, d.direccion, d.monto, d.descripcion, d.fecha, d.saldada_en,
+				       (SELECT json_agg(json_build_object('monto', a.monto, 'fecha', a.fecha) ORDER BY a.fecha)::text
+				        FROM abonos a WHERE a.deuda_id = d.id) AS abonos
+				FROM deudas d WHERE d.usuario_id = ? ORDER BY d.fecha""", usuarioId));
+		datos.put("pagosFijos", lista("""
+				SELECT id, nombre, monto, dia_del_mes, categoria_id, cuenta_id, activo
+				FROM pagos_fijos WHERE usuario_id = ? ORDER BY dia_del_mes""", usuarioId));
+		datos.put("metas", lista("""
+				SELECT m.id, m.nombre, m.monto_objetivo, m.fecha_objetivo,
+				       (SELECT json_agg(json_build_object('monto', a.monto, 'fecha', a.fecha) ORDER BY a.fecha)::text
+				        FROM aportes a WHERE a.meta_id = m.id) AS aportes
+				FROM metas m WHERE m.usuario_id = ? ORDER BY m.creado_en""", usuarioId));
 		datos.put("presupuestos", lista("""
 				SELECT id, categoria_id, mes, monto_limite
 				FROM presupuestos WHERE usuario_id = ? ORDER BY mes""", usuarioId));

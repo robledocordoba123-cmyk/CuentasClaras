@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertTriangle, ArrowDownRight, ArrowUpRight, PiggyBank, Scale, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, CalendarClock, PiggyBank, Scale, Target, Users, Wallet } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useDatos } from "../utils/useDatos";
 import { formatearPesos, formatearPorcentaje, mesActual, nombreMes } from "../utils/formato";
@@ -57,11 +57,28 @@ function Indicador({ titulo, valor, icono: Icono, tono }) {
   );
 }
 
+// Atajo a una sección con su cifra principal.
+function Atajo({ a, icono: Icono, titulo, texto, detalle }) {
+  return (
+    <Link to={a} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-panel p-4 transition hover:border-slate-400">
+      <span className="rounded-lg bg-slate-100 p-2 text-slate-700"><Icono size={18} aria-hidden="true" /></span>
+      <span className="min-w-0">
+        <span className="block text-sm text-slate-500">{titulo}</span>
+        <span className="cifra block text-lg font-semibold text-slate-900">{texto}</span>
+        {detalle && <span className="block text-xs text-slate-500">{detalle}</span>}
+      </span>
+    </Link>
+  );
+}
+
 export default function ResumenPage() {
   const [mes, setMes] = useState(mesActual());
   const { datos: resumen, error } = useDatos(`/resumen?mes=${mes}`);
   const { datos: tendencia } = useDatos("/resumen/tendencia?meses=6");
   const { datos: cuentas } = useDatos("/cuentas");
+  const { datos: pagos } = useDatos(`/pagos-fijos?mes=${mes}`);
+  const { datos: personas } = useDatos("/personas");
+  const { datos: metas } = useDatos("/metas");
 
   const saldoTotal = cuentas?.reduce((suma, c) => suma + Number(c.saldoActual), 0) ?? 0;
 
@@ -79,6 +96,18 @@ export default function ResumenPage() {
             <Indicador titulo="Ingresos del mes" valor={resumen.totalIngresos} icono={ArrowUpRight} tono="verde" />
             <Indicador titulo="Gastos del mes" valor={resumen.totalGastos} icono={ArrowDownRight} tono="rojo" />
             <Indicador titulo="Balance del mes" valor={resumen.balance} icono={Scale} tono={resumen.balance >= 0 ? "verde" : "rojo"} />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Atajo a="/pagos-fijos" icono={CalendarClock} titulo="Pagos fijos del mes"
+              texto={!pagos ? "…" : pagos.every((p) => p.estado === "PAGADO") ? "Todo pagado" : `Faltan ${formatearPesos(pagos.filter((p) => p.estado !== "PAGADO").reduce((s, p) => s + Number(p.monto), 0))}`}
+              detalle={pagos && `${pagos.filter((p) => p.estado === "VENCIDO").length} vencidos de ${pagos.length}`} />
+            <Atajo a="/personas" icono={Users} titulo="Con personas"
+              texto={!personas ? "…" : `Te deben ${formatearPesos(personas.reduce((s, p) => s + Number(p.teDebe), 0))}`}
+              detalle={personas && `Debes ${formatearPesos(personas.reduce((s, p) => s + Number(p.leDebes), 0))}`} />
+            <Atajo a="/metas" icono={Target} titulo="Metas de ahorro"
+              texto={!metas ? "…" : `${formatearPesos(metas.reduce((s, m) => s + Number(m.ahorrado), 0))} ahorrados`}
+              detalle={metas && `${metas.filter((m) => m.cumplida).length} de ${metas.length} cumplidas`} />
           </div>
 
           {resumen.alertas.length > 0 && (

@@ -33,6 +33,11 @@ public class Meses {
 		return YearMonth.now(reloj.withZone(zona));
 	}
 
+	/** El día de hoy en Colombia (RN-09). */
+	public java.time.LocalDate hoy() {
+		return java.time.LocalDate.now(reloj.withZone(zona));
+	}
+
 	/** Convierte "2026-09" en un YearMonth; si viene vacío, devuelve el mes actual. */
 	public YearMonth parsearOActual(String mes) {
 		if (mes == null || mes.isBlank()) {

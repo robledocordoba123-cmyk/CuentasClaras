@@ -3,6 +3,8 @@ import { Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { api } from "../api/cliente";
 import { useDatos } from "../utils/useDatos";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, Modal, Tarjeta } from "../components/ui";
+import Pestanas from "../components/Pestanas";
+import { GRUPO_MOVIMIENTOS } from "../utils/grupos";
 
 export default function CategoriasPage() {
   const { datos: categorias, error, recargar } = useDatos("/categorias");
@@ -89,6 +91,7 @@ export default function CategoriasPage() {
           </Boton>
         }
       />
+      <Pestanas grupo={GRUPO_MOVIMIENTOS} etiqueta="Movimientos" />
       {error && <Aviso>{error}</Aviso>}
       {!categorias ? (
         <Cargando />

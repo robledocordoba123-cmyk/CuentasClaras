@@ -1,13 +1,15 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
-import { ArrowLeftRight, LayoutDashboard, LogOut, PiggyBank, Tags, Wallet } from "lucide-react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { ArrowLeftRight, LayoutDashboard, LogOut, Mail, Users, Wallet } from "lucide-react";
 import { useSesion } from "../context/SesionContext";
 
 const OPCIONES = [
   { a: "/", texto: "Resumen", icono: LayoutDashboard },
   { a: "/movimientos", texto: "Movimientos", icono: ArrowLeftRight },
   { a: "/cuentas", texto: "Cuentas", icono: Wallet },
-  { a: "/presupuestos", texto: "Presupuestos", icono: PiggyBank },
-  { a: "/categorias", texto: "Categorías", icono: Tags },
+  // "Sobres" agrupa los presupuestos del mes y las metas de ahorro; Movimientos
+  // agrupa también los pagos fijos y las categorías (ver Pestanas.jsx).
+  { a: "/presupuestos", texto: "Sobres", icono: Mail, tambien: ["/metas"] },
+  { a: "/personas", texto: "Personas", icono: Users },
 ];
 
 // El logo: un sobre cuya solapa es un chulo. Cuentas claras = cuentas en orden.
@@ -43,6 +45,9 @@ function iniciales(nombre = "") {
 
 export default function Layout() {
   const { usuario, cerrarSesion } = useSesion();
+  const { pathname } = useLocation();
+  // Una sección queda marcada también en sus pestañas hermanas.
+  const activa = (opcion, isActive) => isActive || (opcion.tambien ?? []).includes(pathname) || (opcion.a === "/movimientos" && ["/pagos-fijos", "/categorias"].includes(pathname));
 
   return (
     <div className="min-h-screen">
@@ -52,20 +57,20 @@ export default function Layout() {
           <Logo />
 
           <nav className="mx-auto hidden items-center gap-1 rounded-full border border-slate-200 bg-panel p-1 lg:flex" aria-label="Secciones">
-            {OPCIONES.map(({ a, texto, icono: Icono }) => (
+            {OPCIONES.map((opcion) => { const { a, texto, icono: Icono } = opcion; return (
               <NavLink
                 key={a}
                 to={a}
                 end={a === "/"}
                 className={({ isActive }) =>
                   `flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-                    isActive ? "bg-tinta text-white" : "text-slate-600 hover:text-slate-900"
+                    activa(opcion, isActive) ? "bg-tinta text-white" : "text-slate-600 hover:text-slate-900"
                   }`
                 }
               >
                 <Icono size={16} aria-hidden="true" /> {texto}
               </NavLink>
-            ))}
+            ); })}
           </nav>
 
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
@@ -96,20 +101,20 @@ export default function Layout() {
 
       {/* Menú inferior flotante en celular */}
       <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-2xl border border-slate-200 bg-panel/95 p-1 shadow-lg backdrop-blur-xl lg:hidden" aria-label="Secciones">
-        {OPCIONES.map(({ a, texto, icono: Icono }) => (
+        {OPCIONES.map((opcion) => { const { a, texto, icono: Icono } = opcion; return (
           <NavLink
             key={a}
             to={a}
             end={a === "/"}
             className={({ isActive }) =>
               `flex flex-col items-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold ${
-                isActive ? "bg-tinta text-white" : "text-slate-600"
+                activa(opcion, isActive) ? "bg-tinta text-white" : "text-slate-600"
               }`
             }
           >
             <Icono size={19} aria-hidden="true" /> {texto}
           </NavLink>
-        ))}
+        ); })}
       </nav>
     </div>
   );

@@ -18,7 +18,13 @@ public class LimpiadorBD {
 	}
 
 	public void limpiar() {
+		jdbc.execute("DELETE FROM abonos");
+		jdbc.execute("DELETE FROM deudas");
+		jdbc.execute("DELETE FROM personas");
+		jdbc.execute("DELETE FROM aportes");
+		jdbc.execute("DELETE FROM metas");
 		jdbc.execute("DELETE FROM movimientos");
+		jdbc.execute("DELETE FROM pagos_fijos");
 		jdbc.execute("DELETE FROM presupuestos");
 		jdbc.execute("DELETE FROM cuentas");
 		jdbc.execute("DELETE FROM categorias WHERE usuario_id IS NOT NULL");
