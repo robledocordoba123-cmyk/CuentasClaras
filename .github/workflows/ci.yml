@@ -1,5 +1,5 @@
-# Compila y corre las pruebas del backend en cada push y Pull Request.
-# Testcontainers levanta PostgreSQL en el Docker que traen los runners de GitHub.
+# En cada push y Pull Request: pruebas del backend (Testcontainers), estilo y pruebas
+# del frontend, y pruebas de punta a punta con un navegador real contra la API y PostgreSQL.
 name: CI
 
 on:
@@ -14,7 +14,7 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -23,18 +23,75 @@ jobs:
       - run: ./mvnw -B verify
 
   frontend:
-    name: Frontend (lint + build)
+    name: Frontend (lint + pruebas + build)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
+
+  e2e:
+    name: De punta a punta (Playwright + axe)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cuentasclaras
+          POSTGRES_PASSWORD: cuentasclaras_dev
+          POSTGRES_DB: cuentasclaras
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U cuentasclaras -d cuentasclaras"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Compilar y encender la API con los datos de la demo
+        working-directory: backend
+        env:
+          SPRING_PROFILES_ACTIVE: local,demo
+          PORT: '8080'
+        run: |
+          ./mvnw -B -q package -DskipTests
+          nohup java -jar target/*.jar > ../api.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:8080/actuator/health && exit 0; sleep 2; done
+          cat ../api.log; exit 1
+      - name: Pruebas de punta a punta
+        working-directory: frontend
+        env:
+          E2E_API_URL: http://localhost:8080
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: reporte-playwright
+          path: |
+            frontend/playwright-report/
+            api.log
+          retention-days: 7

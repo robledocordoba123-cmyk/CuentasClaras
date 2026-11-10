@@ -142,6 +142,16 @@ cd backend
 
 No necesitan la base de docker compose: Testcontainers levanta su propio PostgreSQL 16 en Docker, aplica las migraciones y lo borra al terminar.
 
+**Tres capas de pruebas, todas en CI en cada cambio:**
+
+- **Backend** (JUnit + MockMvc + Testcontainers, 98 pruebas): reglas de negocio, seguridad de la sesión, Ley 1581, concurrencia (transferencias atómicas y abonos simultáneos) y migraciones contra PostgreSQL real.
+- **Pantallas** (Vitest + Testing Library, `npm test` en `frontend`): sobres, personas, pagos fijos, registro con autorización, espera de la API dormida, pantalla de error y 404.
+- **De punta a punta** (Playwright + axe, `npx playwright test`): un navegador real, en computador y celular, registra una deuda y la abona, paga un pago fijo, crea y borra una cuenta, y revisa la accesibilidad (WCAG 2.1 AA) de cada pantalla. En CI se compila la API, se enciende con los datos de la demo y PostgreSQL, y se prueba la web compilada.
+
+Para las de punta a punta en local: enciende la API con `SPRING_PROFILES_ACTIVE=local,demo` y corre `E2E_API_URL=http://localhost:8080 npx playwright test` en `frontend`.
+
+**Operación:** en producción los registros salen en JSON (formato ECS) para buscarlos en Render; la salud está en `/actuator/health` (y en `/api/salud` a través de Vercel). Dependabot revisa Maven, npm y las acciones de GitHub cada semana.
+
 ## Avance
 
 - [x] Diseño

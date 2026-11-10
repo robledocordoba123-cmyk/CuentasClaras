@@ -13,6 +13,7 @@ import PersonasPage from "./pages/PersonasPage";
 import PagosFijosPage from "./pages/PagosFijosPage";
 import MetasPage from "./pages/MetasPage";
 import PrivacidadPage from "./pages/PrivacidadPage";
+import NoEncontradaPage from "./pages/NoEncontradaPage";
 
 // Mientras se comprueba la sesión. Si la API estaba dormida, se explica por qué tarda.
 function Abriendo() {
@@ -33,6 +34,8 @@ function Abriendo() {
   );
 }
 
+const RUTAS_DE_LA_APP = ["/", "/movimientos", "/cuentas", "/presupuestos", "/categorias", "/perfil", "/personas", "/pagos-fijos", "/metas"];
+
 export default function App() {
   const { estado, usuario } = useSesion();
 
@@ -44,7 +47,9 @@ export default function App() {
       <Routes>
         <Route path="/acceso" element={<AccesoPage />} />
         <Route path="/privacidad" element={<PrivacidadPage />} />
-        <Route path="*" element={<Navigate to="/acceso" replace />} />
+        {/* Las direcciones de la app llevan al acceso; las que no existen, a la 404. */}
+        {RUTAS_DE_LA_APP.map((ruta) => <Route key={ruta} path={ruta} element={<Navigate to="/acceso" replace />} />)}
+        <Route path="*" element={<NoEncontradaPage />} />
       </Routes>
     );
   }
@@ -63,7 +68,8 @@ export default function App() {
         <Route path="pagos-fijos" element={<PagosFijosPage />} />
         <Route path="metas" element={<MetasPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/acceso" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NoEncontradaPage />} />
     </Routes>
   );
 }
