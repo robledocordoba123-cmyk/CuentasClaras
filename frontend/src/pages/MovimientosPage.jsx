@@ -5,6 +5,8 @@ import { useDatos } from "../utils/useDatos";
 import { formatearFecha, formatearPesos, hoyISO, mesActual } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
 import SelectorMes from "../components/SelectorMes";
+import Pestanas from "../components/Pestanas";
+import { GRUPO_MOVIMIENTOS } from "../utils/grupos";
 
 const TAMANO_PAGINA = 15;
 const VACIO = { tipo: "GASTO", cuentaId: "", categoriaId: "", monto: "", fecha: hoyISO(), descripcion: "" };
@@ -91,6 +93,7 @@ export default function MovimientosPage() {
           </div>
         }
       />
+      <Pestanas grupo={GRUPO_MOVIMIENTOS} etiqueta="Movimientos" />
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <SelectorMes mes={mes} alCambiar={(m) => { setMes(m); setPagina(0); }} />

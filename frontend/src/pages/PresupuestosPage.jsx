@@ -6,6 +6,8 @@ import { formatearPesos, mesActual } from "../utils/formato";
 import { Aviso, Boton, Campo, Cargando, EncabezadoPagina, EstadoVacio, Modal } from "../components/ui";
 import SelectorMes from "../components/SelectorMes";
 import Sobre from "../components/Sobre";
+import Pestanas from "../components/Pestanas";
+import { GRUPO_SOBRES } from "../utils/grupos";
 
 // Semáforo de HU-07: los mismos umbrales que calcula la API (80 % y 100 %).
 const ESTILO_ESTADO = {
@@ -47,7 +49,7 @@ export default function PresupuestosPage() {
   return (
     <div>
       <EncabezadoPagina
-        titulo="Presupuestos"
+        titulo="Sobres del mes"
         subtitulo="Un sobre por categoría: empieza lleno y se vacía al gastar. Te avisamos cuando le quede el 20 %."
         accion={
           <div className="flex flex-wrap gap-2">
@@ -64,6 +66,7 @@ export default function PresupuestosPage() {
           </div>
         }
       />
+      <Pestanas grupo={GRUPO_SOBRES} etiqueta="Sobres" />
       {error && <Aviso>{error}</Aviso>}
 
       {!presupuestos ? (

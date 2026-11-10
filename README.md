@@ -95,6 +95,30 @@ Cada persona solo ve y modifica lo suyo: pedir un recurso ajeno responde 404, ig
 
 Si no se indica el mes, se usa el mes actual en hora de Colombia.
 
+### Cuentas con personas
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET / POST | `/api/personas` | Personas con lo que te deben, lo que les debes y el neto |
+| PUT / DELETE | `/api/personas/{id}` | Renombrar; borrar solo si no tiene deudas |
+| GET / POST | `/api/deudas?personaId=&soloPendientes=` | Deudas (`ME_DEBEN` o `DEBO`) con sus abonos y lo pendiente |
+| DELETE | `/api/deudas/{id}` | Borra la deuda y sus abonos |
+| POST / DELETE | `/api/deudas/{id}/abonos[/{abonoId}]` | Abonar (nunca más de lo pendiente; al completar se salda) o quitar un abono |
+
+La deuda se bloquea (`SELECT … FOR UPDATE`) mientras se registra un abono: una prueba manda cinco abonos simultáneos y la suma nunca supera el monto. Las deudas no cambian los saldos de las cuentas: prestar no es gastar.
+
+### Pagos fijos y metas de ahorro
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/pagos-fijos?mes=2026-11` | Pagos del mes: `PAGADO`, `PENDIENTE` o `VENCIDO` |
+| POST / PUT / DELETE | `/api/pagos-fijos[/{id}]` | Si ya tiene pagos, borrar lo desactiva |
+| POST | `/api/pagos-fijos/{id}/pagar` | Crea el gasto del mes; un índice único impide pagar dos veces el mismo mes |
+| GET / POST / PUT / DELETE | `/api/metas[/{id}]` | Metas con lo ahorrado, lo que falta y cuánto apartar al mes |
+| POST | `/api/metas/{id}/aportes` | Aporte (positivo) o retiro (negativo, sin pasar de lo ahorrado) |
+
+Un pago del día 31 vence el último día en los meses más cortos. Borrar el gasto de un pago fijo lo deja pendiente otra vez.
+
 Documentación interactiva: `http://localhost:8080/swagger-ui.html` (botón **Authorize** para pegar el token).
 
 Los errores siguen el estándar RFC 9457 (`application/problem+json`): `{ "status", "title", "detail" }`, y en validaciones un objeto `errores` por campo.

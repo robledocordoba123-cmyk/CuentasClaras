@@ -50,6 +50,9 @@ import java.util.List;
 @EnableConfigurationProperties(JwtProperties.class)
 public class SeguridadConfig {
 
+	private static final java.util.Set<String> RUTAS_PUBLICAS =
+			java.util.Set.of("/api/auth/login", "/api/auth/registro", "/api/auth/logout");
+
 	@Bean
 	SecurityFilterChain filtroDeSeguridad(HttpSecurity http) throws Exception {
 		return http
@@ -105,11 +108,20 @@ public class SeguridadConfig {
 		return fuente;
 	}
 
-	/** Lee el token de la cookie de sesión; si no está, del encabezado Authorization. */
+	/**
+	 * Lee el token de la cookie de sesión; si no está, del encabezado Authorization.
+	 * Las rutas públicas no leen la cookie: un token vencido o de una cuenta ya
+	 * borrada haría que Spring respondiera 401 incluso al login, y la persona no
+	 * podría volver a entrar.
+	 */
 	@Bean
 	BearerTokenResolver bearerTokenResolver() {
 		DefaultBearerTokenResolver encabezado = new DefaultBearerTokenResolver();
 		return peticion -> {
+			String ruta = peticion.getRequestURI();
+			if (RUTAS_PUBLICAS.contains(ruta) || ruta.startsWith("/actuator/health")) {
+				return null;
+			}
 			var cookie = WebUtils.getCookie(peticion, CookieDeSesion.NOMBRE);
 			if (cookie != null && !cookie.getValue().isBlank()) {
 				return cookie.getValue();

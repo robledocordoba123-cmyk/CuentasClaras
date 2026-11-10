@@ -66,12 +66,13 @@ public class DatosDeDemo implements ApplicationRunner {
 	private final PresupuestoRepository presupuestoRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JdbcTemplate jdbc;
+	private final co.cuentasclaras.usuario.BorradoDeDatos borradoDeDatos;
 	private final Meses meses;
 	private final Clock reloj;
 
 	public DatosDeDemo(UsuarioRepository usuarioRepository, CuentaRepository cuentaRepository,
 			CategoriaRepository categoriaRepository, MovimientoRepository movimientoRepository,
-			PresupuestoRepository presupuestoRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbc,
+			PresupuestoRepository presupuestoRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbc, co.cuentasclaras.usuario.BorradoDeDatos borradoDeDatos,
 			Meses meses, Clock reloj) {
 		this.usuarioRepository = usuarioRepository;
 		this.cuentaRepository = cuentaRepository;
@@ -80,6 +81,7 @@ public class DatosDeDemo implements ApplicationRunner {
 		this.presupuestoRepository = presupuestoRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jdbc = jdbc;
+		this.borradoDeDatos = borradoDeDatos;
 		this.meses = meses;
 		this.reloj = reloj;
 	}
@@ -135,6 +137,7 @@ public class DatosDeDemo implements ApplicationRunner {
 		}
 
 		definirPresupuestos(u, actual, mascotas.getId());
+		personasPagosFijosYMetas(u, hoy, actual, banco, nequi);
 		log.info("Datos de demostración listos: {} / {}", EMAIL, PASSWORD);
 	}
 
@@ -159,15 +162,77 @@ public class DatosDeDemo implements ApplicationRunner {
 		presupuestoRepository.save(new Presupuesto(u, categoria, mes, limite));
 	}
 
+	/**
+	 * Cuentas con personas, pagos fijos y metas, con fechas relativas a hoy. Los
+	 * arriendos y planes de celular que ya trae la demo quedan ligados a su pago fijo.
+	 */
+	private void personasPagosFijosYMetas(UUID u, LocalDate hoy, YearMonth actual, Cuenta banco, Cuenta nequi) {
+		UUID valentina = persona(u, "Valentina");
+		UUID andres = persona(u, "Andrés");
+		UUID mama = persona(u, "Mamá");
+		UUID almuerzo = deuda(u, valentina, "ME_DEBEN", 60_000, "Mitad del almuerzo y el cine", hoy.minusDays(10));
+		abono(almuerzo, 20_000, hoy.minusDays(3));
+		deuda(u, andres, "DEBO", 150_000, "Me prestó para el pasaje a Bogotá", hoy.minusDays(20));
+		UUID mercado = deuda(u, mama, "ME_DEBEN", 45_000, "Mercado que le hice", hoy.minusDays(30));
+		abono(mercado, 45_000, hoy.minusDays(25));
+		jdbc.update("UPDATE deudas SET saldada_en = now() WHERE id = ?", mercado);
+
+		UUID arriendo = pagoFijo(u, "Arriendo", 950_000, 3, ARRIENDO, banco.getId());
+		UUID celular = pagoFijo(u, "Plan de celular", 65_000, 12, SERVICIOS, nequi.getId());
+		pagoFijo(u, "Internet", 89_900, 20, SERVICIOS, banco.getId());
+		jdbc.update("UPDATE movimientos SET pago_fijo_id = ?, periodo = to_char(fecha, 'YYYY-MM') WHERE usuario_id = ? AND descripcion = 'Arriendo apartamento'", arriendo, u);
+		jdbc.update("UPDATE movimientos SET pago_fijo_id = ?, periodo = to_char(fecha, 'YYYY-MM') WHERE usuario_id = ? AND descripcion = 'Plan de celular'", celular, u);
+
+		UUID viaje = meta(u, "Viaje a Cartagena", 1_800_000, actual.plusMonths(5).atEndOfMonth());
+		UUID emergencia = meta(u, "Fondo de emergencia", 3_000_000, null);
+		for (int i = 2; i >= 0; i--) {
+			LocalDate dia = actual.minusMonths(i).atDay(2);
+			if (!dia.isAfter(hoy)) {
+				aporte(viaje, 200_000, dia);
+				aporte(emergencia, 150_000, dia);
+			}
+		}
+	}
+
+	private UUID persona(UUID u, String nombre) {
+		UUID id = UUID.randomUUID();
+		jdbc.update("INSERT INTO personas (id, usuario_id, nombre) VALUES (?, ?, ?)", id, u, nombre);
+		return id;
+	}
+
+	private UUID deuda(UUID u, UUID persona, String direccion, int monto, String descripcion, LocalDate fecha) {
+		UUID id = UUID.randomUUID();
+		jdbc.update("INSERT INTO deudas (id, usuario_id, persona_id, direccion, monto, descripcion, fecha) VALUES (?, ?, ?, ?, ?, ?, ?)",
+				id, u, persona, direccion, BigDecimal.valueOf(monto), descripcion, java.sql.Date.valueOf(fecha));
+		return id;
+	}
+
+	private void abono(UUID deuda, int monto, LocalDate fecha) {
+		jdbc.update("INSERT INTO abonos (id, deuda_id, monto, fecha) VALUES (?, ?, ?, ?)", UUID.randomUUID(), deuda,
+				BigDecimal.valueOf(monto), java.sql.Date.valueOf(fecha));
+	}
+
+	private UUID pagoFijo(UUID u, String nombre, int monto, int dia, UUID categoria, UUID cuenta) {
+		UUID id = UUID.randomUUID();
+		jdbc.update("INSERT INTO pagos_fijos (id, usuario_id, nombre, monto, dia_del_mes, categoria_id, cuenta_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+				id, u, nombre, BigDecimal.valueOf(monto), dia, categoria, cuenta);
+		return id;
+	}
+
+	private UUID meta(UUID u, String nombre, int objetivo, LocalDate fecha) {
+		UUID id = UUID.randomUUID();
+		jdbc.update("INSERT INTO metas (id, usuario_id, nombre, monto_objetivo, fecha_objetivo) VALUES (?, ?, ?, ?, ?)",
+				id, u, nombre, BigDecimal.valueOf(objetivo), fecha == null ? null : java.sql.Date.valueOf(fecha));
+		return id;
+	}
+
+	private void aporte(UUID meta, int monto, LocalDate fecha) {
+		jdbc.update("INSERT INTO aportes (id, meta_id, monto, fecha) VALUES (?, ?, ?, ?)", UUID.randomUUID(), meta,
+				BigDecimal.valueOf(monto), java.sql.Date.valueOf(fecha));
+	}
+
 	private void borrarDemoAnterior() {
-		usuarioRepository.findByEmail(EMAIL).ifPresent(anterior -> {
-			UUID id = anterior.getId();
-			jdbc.update("DELETE FROM movimientos WHERE usuario_id = ?", id);
-			jdbc.update("DELETE FROM presupuestos WHERE usuario_id = ?", id);
-			jdbc.update("DELETE FROM cuentas WHERE usuario_id = ?", id);
-			jdbc.update("DELETE FROM categorias WHERE usuario_id = ?", id);
-			jdbc.update("DELETE FROM usuarios WHERE id = ?", id);
-		});
+		usuarioRepository.findByEmail(EMAIL).ifPresent(anterior -> borradoDeDatos.borrarTodoDe(anterior.getId()));
 	}
 
 	/** Ayudante para crear movimientos de un mes sin pasarse de hoy. */

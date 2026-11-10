@@ -13,7 +13,7 @@ import co.cuentasclaras.comun.error.RecursoNoEncontradoException;
 import co.cuentasclaras.comun.error.ReglaDeNegocioException;
 import co.cuentasclaras.usuario.Usuario;
 import co.cuentasclaras.usuario.UsuarioRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
+import co.cuentasclaras.usuario.BorradoDeDatos;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final TokenService tokenService;
 	private final LimitadorDeIntentos limitador;
-	private final JdbcTemplate jdbc;
+	private final BorradoDeDatos borradoDeDatos;
 	private final Clock reloj;
 
 	/**
@@ -46,12 +46,12 @@ public class AuthService {
 	private final String hashDeRelleno;
 
 	public AuthService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder,
-			TokenService tokenService, LimitadorDeIntentos limitador, JdbcTemplate jdbc, Clock reloj) {
+			TokenService tokenService, LimitadorDeIntentos limitador, BorradoDeDatos borradoDeDatos, Clock reloj) {
 		this.usuarioRepository = usuarioRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.tokenService = tokenService;
 		this.limitador = limitador;
-		this.jdbc = jdbc;
+		this.borradoDeDatos = borradoDeDatos;
 		this.reloj = reloj;
 		this.hashDeRelleno = passwordEncoder.encode(UUID.randomUUID().toString());
 	}
@@ -107,7 +107,7 @@ public class AuthService {
 
 	/**
 	 * Ley 1581, derecho de supresión: borra la cuenta y todo lo que la persona
-	 * registró. El orden respeta las llaves foráneas. No se puede deshacer.
+	 * registró (ver BorradoDeDatos). No se puede deshacer.
 	 */
 	@Transactional
 	public void borrarCuenta(UUID usuarioId, String password) {
@@ -116,11 +116,7 @@ public class AuthService {
 		if (!passwordEncoder.matches(password, usuario.getPasswordHash())) {
 			throw new ReglaDeNegocioException("La contraseña no es correcta.");
 		}
-		jdbc.update("DELETE FROM movimientos WHERE usuario_id = ?", usuarioId);
-		jdbc.update("DELETE FROM presupuestos WHERE usuario_id = ?", usuarioId);
-		jdbc.update("DELETE FROM cuentas WHERE usuario_id = ?", usuarioId);
-		jdbc.update("DELETE FROM categorias WHERE usuario_id = ?", usuarioId);
-		jdbc.update("DELETE FROM usuarios WHERE id = ?", usuarioId);
+		borradoDeDatos.borrarTodoDe(usuarioId);
 	}
 
 	private Usuario buscar(UUID usuarioId) {

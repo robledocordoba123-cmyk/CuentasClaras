@@ -9,6 +9,9 @@ import CuentasPage from "./pages/CuentasPage";
 import PresupuestosPage from "./pages/PresupuestosPage";
 import CategoriasPage from "./pages/CategoriasPage";
 import PerfilPage from "./pages/PerfilPage";
+import PersonasPage from "./pages/PersonasPage";
+import PagosFijosPage from "./pages/PagosFijosPage";
+import MetasPage from "./pages/MetasPage";
 import PrivacidadPage from "./pages/PrivacidadPage";
 
 // Mientras se comprueba la sesión. Si la API estaba dormida, se explica por qué tarda.
@@ -56,6 +59,9 @@ export default function App() {
         <Route path="presupuestos" element={<PresupuestosPage />} />
         <Route path="categorias" element={<CategoriasPage />} />
         <Route path="perfil" element={<PerfilPage />} />
+        <Route path="personas" element={<PersonasPage />} />
+        <Route path="pagos-fijos" element={<PagosFijosPage />} />
+        <Route path="metas" element={<MetasPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
