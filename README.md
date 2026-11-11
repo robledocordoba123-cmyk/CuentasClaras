@@ -14,9 +14,13 @@ El diseño completo (historias de usuario, reglas de negocio, modelo de datos y 
 
 ![Resumen del mes](docs/capturas/02-resumen.png)
 
-| Presupuestos como sobres | Movimientos | En el celular |
+| Sobres del mes | Movimientos | En el celular |
 |---|---|---|
 | ![Presupuestos](docs/capturas/05-presupuestos.png) | ![Movimientos](docs/capturas/03-movimientos.png) | ![Celular](docs/capturas/07-celular.png) |
+
+| Cuentas con personas | Pagos fijos | Metas de ahorro |
+|---|---|---|
+| ![Personas](docs/capturas/08-personas.png) | ![Pagos fijos](docs/capturas/09-pagos-fijos.png) | ![Metas](docs/capturas/10-metas.png) |
 
 **Identidad: "sobres".** La app toma el método de toda la vida de repartir la plata del mes en sobres: cada presupuesto se dibuja como un sobre que empieza lleno y se vacía al gastar; si te pasas, queda vacío y su solapa se pone carmín. Fondo claro de papel de seguridad, texto grafito y cifras en una serif de grabado (Fraunces) con números de igual ancho. Los colores salen de los billetes colombianos —turquesa (2 mil), ocre (5 mil), carmín (10 mil), naranja (20 mil), violeta (50 mil) y verde (100 mil)— y el saldo total se muestra como un billete con guilloche, las líneas finas de seguridad, dibujadas con matemática ([`Guilloche.jsx`](frontend/src/components/Guilloche.jsx)). Solo se toma el color: ningún diseño de billete se copia. Todo sale de [`index.css`](frontend/src/index.css); las letras van dentro del sitio, sin depender de Google Fonts.
 
