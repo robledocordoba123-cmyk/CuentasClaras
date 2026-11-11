@@ -136,8 +136,8 @@ export default function AccesoPage() {
       </div>
 
       <div className="relative hidden flex-col justify-between overflow-hidden bg-tinta p-12 text-white lg:flex">
-        <Guilloche color="#3ec3d4" className="pointer-events-none absolute -right-40 -top-40 h-[42rem] w-[42rem]" opacidad={0.28} />
-        <Guilloche color="#b7791f" lineas={10} ondas={12} className="pointer-events-none absolute -bottom-56 -left-40 h-[34rem] w-[34rem]" opacidad={0.22} />
+        <Guilloche className="pointer-events-none absolute -right-40 -top-40 h-[42rem] w-[42rem]" opacidad={0.28} />
+        <Guilloche variante="ocre" className="pointer-events-none absolute -bottom-56 -left-40 h-[34rem] w-[34rem]" opacidad={0.22} />
 
         {/* Tres sobres del mes: el de mercado casi lleno, el de domicilios a medias y el de salidas vacío. */}
         <div className="relative mx-auto mt-10 grid w-full max-w-md grid-cols-3 gap-4" aria-hidden="true">
