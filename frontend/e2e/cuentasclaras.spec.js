@@ -77,3 +77,11 @@ test("una dirección que no existe muestra la 404", async ({ page }) => {
   await page.goto("/esto-no-existe");
   await expect(page.getByRole("heading", { name: "Este sobre está vacío." })).toBeVisible();
 });
+
+test("la página de inicio deja probar la demo con un clic", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Reparte la plata del mes en sobres.", level: 1 })).toBeVisible();
+  await page.getByRole("button", { name: /Probar la demo/ }).click();
+  await expect(page.getByRole("heading", { name: "Resumen", level: 1 })).toBeVisible();
+  await expect(page).toHaveTitle("Resumen · CuentasClaras");
+});

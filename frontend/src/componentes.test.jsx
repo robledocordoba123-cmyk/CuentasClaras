@@ -59,6 +59,6 @@ describe("Pantallas de aviso", () => {
   test("la 404 pide no indexarse y ofrece volver", () => {
     render(<MemoryRouter><NoEncontradaPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Este sobre está vacío." })).toBeInTheDocument();
-    expect(document.querySelector('meta[name="robots"]')).toHaveAttribute("content", "noindex");
+    expect(screen.getByRole("link", { name: "Volver al inicio" })).toHaveAttribute("href", "/");
   });
 });

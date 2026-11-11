@@ -16,7 +16,7 @@ async function sinProblemas(page, contexto) {
 }
 
 test("pantallas públicas", async ({ page }) => {
-  for (const ruta of ["/acceso", "/privacidad", "/no-existe"]) {
+  for (const ruta of ["/", "/acceso", "/privacidad", "/no-existe"]) {
     await page.goto(ruta);
     await listo(page);
     await sinProblemas(page, ruta);
