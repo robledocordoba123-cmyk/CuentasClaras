@@ -8,7 +8,7 @@ App de finanzas personales para quien maneja su plata repartida entre efectivo, 
 
 **Demo en vivo:** [cuentasclaras-demo.vercel.app](https://cuentasclaras-demo.vercel.app). Usa el botón *Entrar a la demo*, no hace falta registrarse. La API corre en el plan gratuito de Render: si lleva un rato sin uso, la primera carga tarda cerca de un minuto mientras despierta.
 
-El diseño completo (historias de usuario, reglas de negocio, modelo de datos y plan de trabajo) está en [`docs/01-diseno.md`](docs/01-diseno.md).
+El diseño completo (historias de usuario, reglas de negocio, modelo de datos y plan de trabajo) está en [`docs/01-diseno.md`](docs/01-diseno.md). Cómo está armada la aplicación: [`docs/02-arquitectura.md`](docs/02-arquitectura.md). Por qué se hizo así: [`docs/03-decisiones.md`](docs/03-decisiones.md).
 
 ![Resumen del mes](docs/capturas/02-resumen.png)
 
