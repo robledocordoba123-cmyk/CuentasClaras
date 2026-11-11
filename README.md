@@ -10,6 +10,8 @@ App de finanzas personales para quien maneja su plata repartida entre efectivo, 
 
 El diseño completo (historias de usuario, reglas de negocio, modelo de datos y plan de trabajo) está en [`docs/01-diseno.md`](docs/01-diseno.md). Cómo está armada la aplicación: [`docs/02-arquitectura.md`](docs/02-arquitectura.md). Por qué se hizo así: [`docs/03-decisiones.md`](docs/03-decisiones.md).
 
+![Página de inicio](docs/capturas/00-inicio.png)
+
 ![Resumen del mes](docs/capturas/02-resumen.png)
 
 | Presupuestos como sobres | Movimientos | En el celular |
