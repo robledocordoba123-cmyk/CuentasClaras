@@ -28,7 +28,7 @@ const pesosCortos = (valor) =>
 function SaldoPrincipal({ valor, cuentas }) {
   return (
     <div className="relative col-span-2 overflow-hidden rounded-2xl bg-tinta p-6 text-white">
-      <Guilloche color="#3ec3d4" className="pointer-events-none absolute -right-24 -top-32 h-80 w-80" opacidad={0.32} />
+      <Guilloche className="pointer-events-none absolute -right-24 -top-32 h-80 w-80" opacidad={0.32} />
       <div className="pointer-events-none absolute inset-2 rounded-xl border border-white/10" aria-hidden="true" />
       <p className="relative flex items-center gap-2 text-sm font-medium text-[#9fdde6]">
         <Wallet size={16} aria-hidden="true" /> Saldo en tus cuentas

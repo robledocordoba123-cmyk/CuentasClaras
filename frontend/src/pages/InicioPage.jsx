@@ -81,7 +81,7 @@ export default function InicioPage() {
           </div>
 
           <div className="relative overflow-hidden rounded-3xl bg-tinta p-8 text-white" aria-hidden="true">
-            <Guilloche color="#3ec3d4" className="pointer-events-none absolute -right-24 -top-24 h-96 w-96" opacidad={0.3} />
+            <Guilloche className="pointer-events-none absolute -right-24 -top-24 h-96 w-96" opacidad={0.3} />
             <p className="relative text-sm text-[#9fdde6]">Saldo en tus cuentas</p>
             <p className="cifra relative mt-1 text-5xl font-semibold">$ 3.794.800</p>
             <div className="relative mt-8 grid grid-cols-3 gap-3">
