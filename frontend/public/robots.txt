@@ -1,0 +1,7 @@
+# Lo público se puede indexar; las pantallas con sesión no.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /perfil
+
+Sitemap: https://cuentasclaras-demo.vercel.app/sitemap.xml

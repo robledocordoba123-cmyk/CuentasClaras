@@ -18,6 +18,13 @@ El diseño completo (historias de usuario, reglas de negocio, modelo de datos y 
 
 **Identidad: "sobres".** La app toma el método de toda la vida de repartir la plata del mes en sobres: cada presupuesto se dibuja como un sobre que empieza lleno y se vacía al gastar; si te pasas, queda vacío y su solapa se pone carmín. Fondo claro de papel de seguridad, texto grafito y cifras en una serif de grabado (Fraunces) con números de igual ancho. Los colores salen de los billetes colombianos —turquesa (2 mil), ocre (5 mil), carmín (10 mil), naranja (20 mil), violeta (50 mil) y verde (100 mil)— y el saldo total se muestra como un billete con guilloche, las líneas finas de seguridad, dibujadas con matemática ([`Guilloche.jsx`](frontend/src/components/Guilloche.jsx)). Solo se toma el color: ningún diseño de billete se copia. Todo sale de [`index.css`](frontend/src/index.css); las letras van dentro del sitio, sin depender de Google Fonts.
 
+## Página pública, velocidad y buscadores
+
+- **Página de inicio** que explica el producto, con *Probar la demo* y *Crear mi cuenta*. Se muestra al instante aunque la API esté dormida: solo una marca sin datos en el navegador dice si hubo sesión y hay que esperarla.
+- **Carga por partes:** de entrada se descargan 75 KB comprimidos (antes 216 KB); el panel y las gráficas llegan al iniciar sesión.
+- **Buscadores y redes:** título por pantalla, imagen para compartir (`public/og.png`), `robots.txt`, `sitemap.xml` y datos estructurados `WebApplication`. Las pantallas con sesión piden no indexarse.
+- **Accesibilidad:** axe revisa cada pantalla en las pruebas de punta a punta; el texto sobre el color de una categoría elige blanco o grafito según el contraste.
+
 ## Stack
 
 | Capa | Tecnologías |

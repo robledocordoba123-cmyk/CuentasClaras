@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Coffee, LogIn, Sparkles, UserPlus } from "lucide-react";
 import { useSesion } from "../context/SesionContext";
 import { Logo } from "../components/Layout";
@@ -7,10 +7,7 @@ import { Aviso, Boton, Campo } from "../components/ui";
 import Guilloche from "../components/Guilloche";
 import Sobre from "../components/Sobre";
 
-// Solo en la demo pública (VITE_MODO_DEMO=true): acceso de un clic a una
-// cuenta con datos de ejemplo, para que quien visite pueda probar sin registrarse.
-const MODO_DEMO = import.meta.env.VITE_MODO_DEMO === "true";
-const CUENTA_DEMO = { email: "demo@cuentasclaras.co", password: "Demo2026!" };
+import { CUENTA_DEMO, MODO_DEMO } from "../utils/demo";
 
 // El plan gratuito del hosting apaga la API tras un rato sin uso y tarda cerca
 // de un minuto en encender: si la respuesta se demora, se explica por qué.
@@ -18,7 +15,8 @@ const MS_ANTES_DE_AVISAR = 4000;
 
 export default function AccesoPage() {
   const { iniciarSesion, registrarse } = useSesion();
-  const [modo, setModo] = useState("login");
+  const [parametros] = useSearchParams();
+  const [modo, setModo] = useState(parametros.get("modo") === "registro" ? "registro" : "login");
   const [datos, setDatos] = useState({ nombre: "", email: "", password: "", aceptaPolitica: false });
   const [error, setError] = useState("");
   const [errores, setErrores] = useState({});
@@ -59,7 +57,7 @@ export default function AccesoPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          <Logo />
+          <Link to="/" aria-label="CuentasClaras, ir al inicio"><Logo /></Link>
           <h1 className="mt-10 text-4xl font-semibold text-slate-900">
             {modo === "login" ? "Inicia sesión" : "Crea tu cuenta"}
           </h1>
