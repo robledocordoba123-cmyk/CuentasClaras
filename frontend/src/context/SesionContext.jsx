@@ -37,6 +37,14 @@ export function SesionProvider({ children }) {
       // Sin almacenamiento no hay nada que borrar.
     }
     let vigente = true;
+    if (!leerMarca()) {
+      // Sin sesión previa no hay nada que comprobar: solo se despierta la API en
+      // segundo plano, para que entrar a la demo o iniciar sesión responda rápido.
+      esperarApi().catch(() => {});
+      return () => {
+        vigente = false;
+      };
+    }
     esperarApi()
       .then(() => api.get("/auth/yo"))
       .then((yo) => vigente && setUsuario(yo))
